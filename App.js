@@ -1,21 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 
-export default function App() {
+import React, { useState, useEffect } from "react";
+import 'react-native-gesture-handler';
+
+import AppNavigator from "./src/AppNavigator";
+import { StrictMode } from 'react';
+import MyProvider from "./src/Context/ContextApp";
+import { initDatabase } from "./src/databases/databaseServices";
+
+
+
+const App = () => {
+
+  //inicializo la base aqui
+  const [dbExists, setDbExists] = useState(false)
+
+  const initDB = async () => {
+    const res = await initDatabase();
+    //si devuelve false es porque no existia y si tru es porquesi
+
+    setDbExists(res);
+  }
+
+
+  useEffect(() => {
+    initDB();
+
+   
+  }, [])
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <MyProvider>
+      <AppNavigator dbExist={dbExists}/>
+    </MyProvider>
+
+
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
+
+
+

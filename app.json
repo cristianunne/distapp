@@ -5,7 +5,12 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9bbd76f3-25d6-4ba5-bcda-0442df51c10b"
+      }
+    }
   },
   "name": "distapp"
 }
