@@ -23,8 +23,8 @@ export async function insertCategories(data){
                     resolve(result);
                 }, (err, sqlerror) => {
                    
-                    console.log(sqlerror);
-                    console.log(err);
+                    //console.log(sqlerror);
+                    //console.log(err);
                     console.log('mmmmmm');
                    
                     //reject();
@@ -36,12 +36,12 @@ export async function insertCategories(data){
 
     let result = await promise.then( (result) => { 
         //setResult(true);
-        console.log(result);
+        //console.log(result);
         return true;
     },
     (error) => { 
         //setResult(false);
-        console.log(error);
+        //console.log(error);
         return false;
        
     });

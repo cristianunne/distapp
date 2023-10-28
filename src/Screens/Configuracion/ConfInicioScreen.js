@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, TouchableOpacity, Image, Text, Alert } from 'react-native'
+import * as SQLITE from 'expo-sqlite'
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
 import { getCategories, getSubcategories } from '../../services/fetching'
@@ -7,13 +8,17 @@ import { insertCategories } from '../../databases/Entity/CategoriesEntity'
 import { insertSubcategories } from '../../databases/Entity/SubcategoriesEntity'
 import { getComprasAPI, getProductosAPI, getProveedoresAPI } from '../../databases/querys'
 import { insertProveedores } from '../../databases/Entity/Proveedores'
-import { insertProductos } from '../../databases/Entity/ProductosEntity'
+import { getProductoById, insertProductos, updateProductos } from '../../databases/Entity/ProductosEntity'
 import { LoadingModal } from "react-native-loading-modal";
 import { AppContext } from '../../Context/ContextApp'
 import { insertCompras, insertEmpleadoComprasstock } from '../../databases/Entity/ComprasEntity'
+import { createTables, database_name, deleteTables } from '../../databases/databaseServices'
+import { compras_table, delete_compras_table, delete_productos_comprasstock_table, productos_comprasstock_table } from '../../databases/querysTables'
+import { useNavigation } from '@react-navigation/native'
 
 const ConfInicioScreen = () => {
 
+    const navigation = useNavigation();
 
     const [categoriesData, setCategoriesData] = useState(null);
 
@@ -39,13 +44,15 @@ const ConfInicioScreen = () => {
                     getCategoriesFromAPI();
                     getSubcategoriesAPI();
 
+                    //traigo los precios y los descuentos
+
 
                     const proveedores = await getProveedoresAPI();
                     //console.log(proveedores[0]);
                     saveProveedoresInDB(proveedores);
 
                     const productos = await getProductosAPI();
-                    //console.log(productos);
+                  
                     saveProductosInDB(productos);
 
 
@@ -74,7 +81,7 @@ const ConfInicioScreen = () => {
     const getSubcategoriesAPI = async () => {
 
         const subcategories = await getSubcategories();
-        console.log(subcategories);
+        //console.log(subcategories);
 
         if (subcategories != false) {
             setSubcategoriesData(subcategories);
@@ -86,13 +93,14 @@ const ConfInicioScreen = () => {
     }
 
 
+
     const saveCategoriesInDB = async (categories) => {
 
 
         for (item of categories) {
             //const res = await insertCategories(categoriesData[i]);
             const res = await insertCategories(item);
-            console.log(res);
+            //console.log(res);
         }
 
 
@@ -120,7 +128,28 @@ const ConfInicioScreen = () => {
 
         for (item of productos)
         {
-            const res = await insertProductos(item);
+            //consulto si el producto existe, si existe actualizo, sino bue, agrego
+
+            const exist_product = await getProductoById(item.idproductos);
+
+            if(exist_product != false){
+
+                if(exist_product.rows.length > 0){
+                    console.log(item.descuentos);
+
+                    //existe el producto entonces lo actualizo
+                    const res = await updateProductos(item);
+                    //console.log('actualizo');
+                } else {
+                    const res = await insertProductos(item);
+                    //console.log('inserto');
+                }
+
+            }
+
+           
+
+            
         }
 
     }; 
@@ -136,6 +165,13 @@ const ConfInicioScreen = () => {
                 text: 'Aceptar', onPress: async () => {
 
                     setIsLoading(true);
+                    const db = SQLITE.openDatabase(database_name);
+                    //aca puedo eliminar las tablas primero
+                    const del_empl_table = await deleteTables(db, delete_productos_comprasstock_table);
+                    const del_compra_table = await deleteTables(db, delete_compras_table);
+                    const create_compra_table = await createTables(db, compras_table);
+                    const create_empcompra_table = await createTables(db, productos_comprasstock_table);
+
 
                     const myobj = JSON.parse(user);
 
@@ -159,7 +195,7 @@ const ConfInicioScreen = () => {
 
     const saveComprasToDB = async (compras) => {
         //console.log("entro aca");
-       console.log(compras);
+       //console.log(compras);
 
         for (item of compras)
         {
@@ -184,6 +220,11 @@ const ConfInicioScreen = () => {
            
         }
 
+    }
+
+
+    const goToClientes = () => {
+        navigation.navigate('ClientesInicioScreen');
     }
 
 
@@ -227,7 +268,7 @@ const ConfInicioScreen = () => {
                 </View>
 
                 <View style={styles.item_content}>
-                    <TouchableOpacity style={styles.item}>
+                    <TouchableOpacity style={styles.item} onPress={goToClientes}>
                         <Image source={require('../../images/clientes.png')} style={styles.iconItem} />
                         <Text style={styles.text_icon}>Clientes</Text>
                     </TouchableOpacity>

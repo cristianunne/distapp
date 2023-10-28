@@ -2,23 +2,54 @@ import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, Image, Text, TextInput } from 'react-native'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
-
 import CustomButton from '../../components/CustomButton'
 import MyButton from '../../components/MyButton'
 import { TYPES_BTN } from '../../styles/common_styles'
+import { LoadingModal } from "react-native-loading-modal";
+import { updateCantidadEmpleadosComprasStock } from '../../databases/Entity/ComprasEntity'
+
 
 const ProductoDetailsScreen = ({ route, navigation }) => {
+
 
     const [icon, setIcon] = useState();
 
     const prod_compra = route.params.prod_compra;
+    const [isLoading, setIsLoading] = useState(false);
 
+    const [empCompraStockId, setEmpCompraStockId] = useState();
     const [cantidad, setCantidad] = useState();
 
     const onChangeText = (text) => {
 
         setCantidad(text);
-        console.log(cantidad);
+        //console.log(cantidad);
+    }
+
+
+    const updateCantidadPress = async () => {
+
+        if(cantidad != undefined && empCompraStockId != undefined){
+
+            //console.log('todo bien ' + empCompraStockId);
+            setIsLoading(true);
+            const resultado = await updateCantidadEmpleadosComprasStock(empCompraStockId, cantidad);
+
+            setTimeout(()=> {
+                setIsLoading(false);
+                if(resultado != false){
+                    navigation.navigate('ProductosComprasScreen');
+                }
+            }, 5000)
+            
+          
+
+
+        } else {
+            console.log('todo mal');
+        }
+
+
     }
 
 
@@ -26,13 +57,18 @@ const ProductoDetailsScreen = ({ route, navigation }) => {
 
     useEffect(() => {
         setIcon('data:image/png;base64,' + route.params.prod_compra.image);
-    }, [cantidad]);
+        setEmpCompraStockId(route.params.prod_compra.empleado_comprastock_id);
+        //console.log(route.params.prod_compra.empleado_comprastock_id);
+        //console.log("empleado " + empCompraStockId);
+    }, [cantidad, empCompraStockId]);
 
     //console.log(route.params.prod_compra);
     return (
         <View style={styles.container}>
             <Header title={'Detalle Compra'} leftIcon={require('../../images/home.png')}
                 rightIcon={require('../../images/cart.png')}></Header>
+
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
 
             <View style={styles.box_main}>
                 {/* pon aquí el texto que quieras */}
@@ -64,7 +100,7 @@ const ProductoDetailsScreen = ({ route, navigation }) => {
 
                 </View>
                 <View style={styles.box_btn}>
-                    <MyButton text={'Aceptar'} type={TYPES_BTN.SUCCESS}></MyButton>
+                    <MyButton text={'Aceptar'} type={TYPES_BTN.SUCCESS} onPress={updateCantidadPress}></MyButton>
                 </View>
                 
             </View>

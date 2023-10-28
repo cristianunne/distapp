@@ -31,7 +31,8 @@ export const productos_table = "CREATE TABLE IF NOT EXISTS productos " +
   "(productos_id INTEGER PRIMARY KEY AUTOINCREMENT, idproductos INTEGER UNIQUE, name VARCHAR(30), " + 
   "marca VARCHAR(50), unidad VARCHAR(20), content REAL, description VARCHAR(150), " + 
   "subcategories_idsubcategories INTEGER, active INTEGER, categories_idcategories INTEGER, " + 
-  "proveedores_idproveedores INTEGER, image TEXT, " +  
+  "proveedores_idproveedores INTEGER, image TEXT, " + 
+  "precio REAL, descuento REAL, " + 
   "FOREIGN KEY(categories_idcategories) REFERENCES categories(idcategories), " + 
   "FOREIGN KEY(subcategories_idsubcategories) REFERENCES subcategories(idsubcategories), " +
   "FOREIGN KEY(proveedores_idproveedores) REFERENCES proveedores(idproveedores));";
@@ -49,12 +50,13 @@ export const compras_table = "CREATE TABLE IF NOT EXISTS compras_stock " +
 export const productos_comprasstock_table = "CREATE TABLE IF NOT EXISTS empleado_comprasstock " +
 "(empleado_comprastock_id INTEGER PRIMARY KEY AUTOINCREMENT, idempleado_comprastock INTEGER UNIQUE, " +
 "productos_idproductos INTEGER, comprasstock_idcomprasstock INTEGER, cantidad INTEGER, " + 
-"comprobante VARCHAR(150), status INTEGER DEFAULT 0, observaciones VARCHAR(250), " + 
+"comprobante VARCHAR(150), status INTEGER DEFAULT 0, observaciones VARCHAR(250), cantidad_comprada INTEGER DEFAULT 0, " + 
 "FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos), " + 
 "FOREIGN KEY(comprasstock_idcomprasstock) REFERENCES compras_stock(idcompras_stock));";
 
 
-
+export const delete_compras_table = "DELETE FROM compras_stock";
+export const delete_productos_comprasstock_table= "DELETE FROM empleado_comprasstock";
 
 
 

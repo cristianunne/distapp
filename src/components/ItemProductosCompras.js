@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import ButtonIcon from './ButtonIcon';
 import { COLORS, TYPES_BTN } from '../styles/common_styles';
+import { AppContext } from '../Context/ContextApp';
+import { setComprasEmpleado } from '../services/fetching';
+import { updateEstadoEmpleadosComprasStock } from '../databases/Entity/ComprasEntity';
 
 
-const ItemProductosCompras = ({ number_compra, prod_compra }) => {
+const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload, setReload }) => {
+
+    const [isLogin, setIsLogin, user, setUser] = useContext(AppContext);
 
     const [isOnPress, setIsOnPress] = useState(false);
     const [fechaInicio, setFechaInicio] = useState();
@@ -16,18 +21,25 @@ const ItemProductosCompras = ({ number_compra, prod_compra }) => {
     const [marca, setMarca] = useState('S/N');
     const [icon, setIcon] = useState();
 
+
+    const [canEdit, setCanEdit] = useState(true)
+
     const navigation = useNavigation();
+
+    const [user_, setUser_] = useState();
+
+
 
 
 
 
     useEffect(() => {
 
-        if (prod_compra.name !== '') {
+        if (prod_compra.name != '') {
             setName(prod_compra.name);
         }
 
-        if (prod_compra.marca !== '') {
+        if (prod_compra.marca != '') {
             setMarca(prod_compra.marca);
         }
 
@@ -35,11 +47,18 @@ const ItemProductosCompras = ({ number_compra, prod_compra }) => {
         setIcon('data:image/png;base64,' + prod_compra.image);
        
         let sts = prod_compra.status == 0 ? 'Pedido' : prod_compra.status == 1 ? 'Comprado' : 
-        prod_compra.status == 3 ? 'Enviado' : null;
-        setEstado(sts); 
+        prod_compra.status == 2 ? 'Enviado' : null;
+        setEstado(sts);
+
+        if(prod_compra.status == 0 || prod_compra.status == 1){
+            setCanEdit(true);
+        } else {
+            setCanEdit(false);
+        }
+        setUser_(JSON.parse(user));
 
 
-    });
+    }, [reload]);
 
 
     const onPress = () => {
@@ -58,6 +77,46 @@ const ItemProductosCompras = ({ number_compra, prod_compra }) => {
     const onPressOut = () => {
 
         setIsOnPress(false);
+    }
+
+    const onPressSendProductoCompra = async () => {
+        setIsLoading(true);
+  
+        const data = {
+            idcomprasstock : prod_compra.comprasstock_idcomprasstock,
+            idproductos : prod_compra.idproductos,
+            cantidad : prod_compra.cantidad_comprada,
+            idusers : user_.idusers
+        }
+
+
+
+        const res = setComprasEmpleado(data);
+
+        if(res){
+
+            //seteo la el estado del producto
+            const res_status = await updateEstadoEmpleadosComprasStock(prod_compra.empleado_comprastock_id, 2);
+
+
+        }
+
+
+        setTimeout(()=> {
+            setIsLoading(false);
+        }, 5000);
+
+       
+        if(reload){
+            setReload(false);
+        } else {
+            setReload(true);
+        }
+
+       
+
+    
+        
     }
 
 
@@ -83,12 +142,15 @@ const ItemProductosCompras = ({ number_compra, prod_compra }) => {
                     </View>
 
                     <View style={styles.box_text_sub_content}>
+                        <Text style={styles.text_campaign}>Cantidad Comprada: </Text>
+                        <Text style={styles.text_details}>{prod_compra.cantidad_comprada}</Text>
+                    </View>
+
+                    <View style={styles.box_text_sub_content}>
                         <Text style={styles.text_estado}>Estado: </Text>
                         <Text style={ prod_compra.status == 0 ? styles.text_details_estado_pedido :  
                         prod_compra.status == 1 ? styles.text_details_estado_comprado : 
                         prod_compra.status == 2 ? styles.text_details_estado_enviado : null}>
-                            
-                            
                             
                             {estado != undefined ? (estado) : null}</Text>
                     </View>
@@ -97,13 +159,15 @@ const ItemProductosCompras = ({ number_compra, prod_compra }) => {
                 </View>
 
                 <View style={styles.btn_container}>
+                {canEdit ?  
                     <View style={styles.box_btn}>
-                        <ButtonIcon type={TYPES_BTN.SUCCESS} icon={'edit'} onPress={onPress}></ButtonIcon>
-                    </View>
+                        <ButtonIcon type={TYPES_BTN.SUCCESS} icon={'edit'} onPress={onPress} size_={24}></ButtonIcon>
+                    </View> : <View style={styles.box_btn}></View>}
                   
+                  {prod_compra.status == 1 ? 
                     <View style={styles.box_btn}>
-                        <ButtonIcon type={TYPES_BTN.PRIMARY} icon={'file-upload'}></ButtonIcon>
-                    </View>
+                        <ButtonIcon type={TYPES_BTN.PRIMARY} icon={'file-upload'} size_={24} onPress={onPressSendProductoCompra}></ButtonIcon>
+                    </View>  : <View style={styles.box_btn}></View>}
                    
                 </View>
             </View>
@@ -119,7 +183,7 @@ export default ItemProductosCompras
 const styles = StyleSheet.create({
 
     container: {
-        height: 100,
+        height: 120,
         marginTop: 10,
         padding: 2,
 

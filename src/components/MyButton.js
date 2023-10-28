@@ -3,6 +3,10 @@ import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { COLORS, TYPES_BTN } from '../styles/common_styles';
 
 const MyButton = ({type, text, onPress}) => {
+
+
+
+
   return (
     <TouchableOpacity style={[styles.container, 
         type == TYPES_BTN.SUCCESS ? styles.success : 

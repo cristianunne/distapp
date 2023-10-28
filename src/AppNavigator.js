@@ -13,6 +13,8 @@ import ConfInicioScreen from "./Screens/Configuracion/ConfInicioScreen";
 import ComprasScreenInicio from "./Screens/compras/ComprasScreenInicio";
 import ProductosComprasScreen from "./Screens/compras/ProductosComprasScreen";
 import ProductoDetailsScreen from "./Screens/compras/ProductoDetailsScreen";
+import ProductosInicioScreen from "./Screens/productos/ProductosInicioScreen";
+import ClientesInicioScreen from "./Screens/clientes/ClientesInicioScreen";
 
 
 
@@ -46,6 +48,8 @@ const AppNavigator = ({ dbExist }) => {
       <Stack.Screen options={{ headerShown: false }} name="InicioCompras" component={ComprasScreenInicio}/>
       <Stack.Screen options={{ headerShown: false }} name="ProductosComprasScreen" component={ProductosComprasScreen} />
       <Stack.Screen options={{ headerShown: false }} name="ProductosDetailssScreen" component={ProductoDetailsScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="ProductosInicioScreen" component={ProductosInicioScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="ClientesInicioScreen" component={ClientesInicioScreen} />
       <Stack.Screen 
       options={{ headerShown: false }} 
       name="Home" component={DrawerHome} />

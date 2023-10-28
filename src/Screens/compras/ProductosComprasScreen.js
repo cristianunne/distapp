@@ -5,13 +5,19 @@ import Footer from '../../components/Footer'
 import { getEmpleadosComprasStock } from '../../databases/Entity/ComprasEntity'
 import ItemProductosCompras from '../../components/ItemProductosCompras'
 import ButtonIcon from '../../components/ButtonIcon'
+import { useIsFocused } from '@react-navigation/native';
+import { LoadingModal } from "react-native-loading-modal";
 
 const ProductosComprasScreen = () => {
 
 
-
+    const isFocused = useIsFocused();
     const [result, setResult] = useState([]);
+    const [estado, setEstado] = useState(false);
     const result_ = [];
+    const [reload, setReload] = useState(false);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const getProductosStockFromDB = async () => {
 
@@ -20,15 +26,17 @@ const ProductosComprasScreen = () => {
         for (let i = 0; i < productos.rows.length; i++)
         {
              let produ = productos.rows.item(i);
-             console.log('dentro');
+            // console.log('dentro');
 
-             console.log(productos.rows.item(i).name);
+             //console.log(productos.rows.item(i).name);
 
-             result_.push(<ItemProductosCompras key={i} prod_compra={produ}/>);
+             result_.push(<ItemProductosCompras key={i} prod_compra={produ} 
+                setIsLoading={setIsLoading} reload={reload} setReload={setReload}/>);
  
         }
 
         setResult(result_);
+        setEstado(true);
 
     }
 
@@ -37,7 +45,9 @@ const ProductosComprasScreen = () => {
 
     useEffect(() => {
         getProductosStockFromDB();
-    },[]);
+        console.log('dentrtcvcvo');
+       
+    }, [isFocused, reload]);
 
 
 
@@ -47,12 +57,12 @@ const ProductosComprasScreen = () => {
          <Header title={'Productos Compras'} leftIcon={require('../../images/home.png')}
                 rightIcon={require('../../images/cart.png')}
             />
+             <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
 
             <View style={styles.box_main}>
                 <SafeAreaView>
                     <ScrollView>
                         {result}
-
                     </ScrollView>
                 </SafeAreaView>
             </View>

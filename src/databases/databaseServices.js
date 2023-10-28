@@ -40,6 +40,7 @@ export async function initDatabase() {
         await createTables(db, clientes_table);
         await createTables(db, proveedores_table);
         await createTables(db, productos_table);
+
         await createTables(db, compras_table);
         await createTables(db, productos_comprasstock_table);
 
@@ -75,5 +76,25 @@ export async function createTables(db, query) {
     });
 
 }
+
+export async function deleteTables(db, query) {
+    return await new Promise((resolve, reject) => {
+        db.transaction(
+            function (tx) {
+                tx.executeSql(query);
+            },
+            function (error) {
+                reject(error.message);
+            },
+            function () {
+                resolve(true);
+                //console.log('Created database OK');
+
+            }
+        );
+    });
+
+}
+
 
 

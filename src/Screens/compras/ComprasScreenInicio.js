@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, Text } from 'react-native'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
-
+import { useIsFocused } from '@react-navigation/native';
 import CardsDefault from '../../components/CardDefault'
 import ItemCompras from '../../components/ItemCompras'
 import { getComprasStock } from '../../databases/Entity/ComprasEntity'
@@ -11,6 +11,8 @@ const ComprasScreenInicio = () => {
 
     const [comprasStock, setComprasStock] = useState();
     const [result, setResult] = useState([]);
+
+    const isFocused = useIsFocused();
 
     const result_ = [];
 
@@ -40,7 +42,7 @@ const ComprasScreenInicio = () => {
 
         getComprasInformation();
 
-    }, []);
+    }, [isFocused]);
 
 
 

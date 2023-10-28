@@ -57,7 +57,7 @@ export async function insertEmpleadoComprasstock(data){
 
     const query = "INSERT INTO empleado_comprasstock (idempleado_comprastock, productos_idproductos, " + 
     "comprasstock_idcomprasstock, cantidad, comprobante, observaciones)" + 
-    " VALUES (?, ?, ?, ?, ?, ?, ?);";
+    " VALUES (?, ?, ?, ?, ?, ?);";
     
 
     let promise = new Promise((resolve, reject) => {
@@ -182,15 +182,16 @@ export async function getEmpleadosComprasStock()
 }
 
 
-export async function getUpdateCantidadEmpleadosComprasStock(empleado_comprastock_id, cantidad)
+export async function updateCantidadEmpleadosComprasStock(empleado_comprastock_id, cantidad)
 {
     const db = SQLITE.openDatabase(database_name);
 
-    const query = "UPDATE empleado_comprasstock SET cantidad = ?, status = 1;";
+    const query = "UPDATE empleado_comprasstock SET cantidad_comprada = ?, status = 1 " + 
+    "WHERE empleado_comprastock_id = ?";
 
     let promise = new Promise((resolve, reject) => {
         db.transaction(tx => {
-            tx.executeSql(query, [cantidad], 
+            tx.executeSql(query, [cantidad, empleado_comprastock_id], 
                 (_, result) => {
                 
             
@@ -210,7 +211,46 @@ export async function getUpdateCantidadEmpleadosComprasStock(empleado_comprastoc
     },
     (error) => { 
         //setResult(false);
-        //console.log('Error en User ENtity CANTIDAD');
+        //console.log(error);
+        return false;
+    });
+
+    //console.log(result);
+    return result;
+
+}
+
+
+export async function updateEstadoEmpleadosComprasStock(empleado_comprastock_id, status)
+{
+    const db = SQLITE.openDatabase(database_name);
+
+    const query = "UPDATE empleado_comprasstock SET status = ? " + 
+    "WHERE empleado_comprastock_id = ?";
+
+    let promise = new Promise((resolve, reject) => {
+        db.transaction(tx => {
+            tx.executeSql(query, [status, empleado_comprastock_id], 
+                (_, result) => {
+                
+            
+                    resolve(result);
+                }, (err) => {
+                   
+                    reject(err);
+   
+                })
+        });
+    });
+
+    let result = await promise.then( (result) => { 
+        //setResult(true);
+        //console.log(result);
+        return result;
+    },
+    (error) => { 
+        //setResult(false);
+        //console.log(error);
         return false;
     });
 

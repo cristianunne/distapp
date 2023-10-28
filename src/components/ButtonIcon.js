@@ -7,7 +7,7 @@ import { COLORS, TYPES_BTN } from '../styles/common_styles';
 
 
 
-const ButtonIcon = ({type, icon, onPress}) => {
+const ButtonIcon = ({type, icon, size_, onPress}) => {
  
 
     return (
@@ -17,7 +17,9 @@ const ButtonIcon = ({type, icon, onPress}) => {
             type == TYPES_BTN.WARNING ? styles.warning : null
         ]} onPress={onPress}>
         
-                <MaterialIcons name={icon} size={24} color="white" />
+                <MaterialIcons name={icon} size={
+                    size_ == undefined ? 24 : size_
+                } color="white" />
            
         </TouchableOpacity>
     );

@@ -16,6 +16,9 @@ const goCompras = () => {
     navigation.navigate('InicioCompras');
 }
 
+const goProductos = () => {
+    navigation.navigate('ProductosInicioScreen');
+}
   return (
     <View style={styles.bottomView}>
                 <TouchableOpacity style={styles.bottonTab}>
@@ -31,7 +34,7 @@ const goCompras = () => {
                     <Image source={require('../images/ventas.png')} style={styles.bottomTabIcon} />
                     <Text style={styles.title}>Ventas</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottonTab}>
+                <TouchableOpacity style={styles.bottonTab} onPress={goProductos}>
                     <Image source={require('../images/productos.png')} style={styles.bottomTabIcon} />
                     <Text style={styles.title}>Productos</Text>
                 </TouchableOpacity>

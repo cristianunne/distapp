@@ -24,8 +24,8 @@ export async function insertSubcategories(data){
                     resolve(result);
                 }, (err, sqlerror) => {
                    
-                    console.log(err);
-                    console.log(sqlerror);
+                    //console.log(err);
+                    //console.log(sqlerror);
                    
                     //reject();
                     reject(sqlerror);
@@ -36,12 +36,12 @@ export async function insertSubcategories(data){
 
     let result = await promise.then( (result) => { 
         //setResult(true);
-        console.log(result);
+        //console.log(result);
         return true;
     },
     (error) => { 
         //setResult(false);
-        console.log(error);
+        //console.log(error);
         return false;
        
     });
