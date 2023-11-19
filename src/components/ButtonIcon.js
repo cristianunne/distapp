@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 7,
         borderBottomRightRadius: 7,
         borderBottomLeftRadius: 7,
+        alignSelf: 'center'
     },
 
     success: {

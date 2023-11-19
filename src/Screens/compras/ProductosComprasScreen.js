@@ -8,7 +8,7 @@ import ButtonIcon from '../../components/ButtonIcon'
 import { useIsFocused } from '@react-navigation/native';
 import { LoadingModal } from "react-native-loading-modal";
 
-const ProductosComprasScreen = () => {
+const ProductosComprasScreen = ({route}) => {
 
 
     const isFocused = useIsFocused();
@@ -16,12 +16,18 @@ const ProductosComprasScreen = () => {
     const [estado, setEstado] = useState(false);
     const result_ = [];
     const [reload, setReload] = useState(false);
+    const [reload2, setReload2] = useState(false);
+
+    const { number_compra } = route.params;
+
 
     const [isLoading, setIsLoading] = useState(false);
 
     const getProductosStockFromDB = async () => {
 
-        const productos = await getEmpleadosComprasStock();
+        const productos = await getEmpleadosComprasStock(number_compra);
+
+        //console.log('vuelve a traer');
       
         for (let i = 0; i < productos.rows.length; i++)
         {
@@ -30,13 +36,15 @@ const ProductosComprasScreen = () => {
 
              //console.log(productos.rows.item(i).name);
 
-             result_.push(<ItemProductosCompras key={i} prod_compra={produ} 
-                setIsLoading={setIsLoading} reload={reload} setReload={setReload}/>);
- 
-        }
+             result_.push(<ItemProductosCompras key={i} number_compra={number_compra} prod_compra={produ} 
+                setIsLoading={setIsLoading} reload={reload} setReload={setReload} reload2={reload2} setReload2={setReload2}/>);
 
+        }
         setResult(result_);
         setEstado(true);
+        setReload(!reload);
+    
+        setReload2(!reload2);
 
     }
 
@@ -45,9 +53,10 @@ const ProductosComprasScreen = () => {
 
     useEffect(() => {
         getProductosStockFromDB();
-        console.log('dentrtcvcvo');
+        //console.log('numero de compra ' + number_compra);
+
        
-    }, [isFocused, reload]);
+    }, [isFocused, reload2]);
 
 
 

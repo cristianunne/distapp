@@ -22,6 +22,9 @@ const ComprasScreenInicio = () => {
         const compras_stock = await getComprasStock();
         setComprasStock(compras_stock);
 
+        console.log('compras');
+        console.log(comprasStock);
+
        
 
        for (let i = 0; i < compras_stock.rows.length; i++)

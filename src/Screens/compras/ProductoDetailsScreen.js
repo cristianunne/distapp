@@ -7,6 +7,8 @@ import MyButton from '../../components/MyButton'
 import { TYPES_BTN } from '../../styles/common_styles'
 import { LoadingModal } from "react-native-loading-modal";
 import { updateCantidadEmpleadosComprasStock } from '../../databases/Entity/ComprasEntity'
+import { showMessage, hideMessage } from "react-native-flash-message";
+
 
 
 const ProductoDetailsScreen = ({ route, navigation }) => {
@@ -15,6 +17,7 @@ const ProductoDetailsScreen = ({ route, navigation }) => {
     const [icon, setIcon] = useState();
 
     const prod_compra = route.params.prod_compra;
+    const number_compra = route.params.number_compra;
     const [isLoading, setIsLoading] = useState(false);
 
     const [empCompraStockId, setEmpCompraStockId] = useState();
@@ -25,6 +28,8 @@ const ProductoDetailsScreen = ({ route, navigation }) => {
         setCantidad(text);
         //console.log(cantidad);
     }
+
+    
 
 
     const updateCantidadPress = async () => {
@@ -38,9 +43,18 @@ const ProductoDetailsScreen = ({ route, navigation }) => {
             setTimeout(()=> {
                 setIsLoading(false);
                 if(resultado != false){
-                    navigation.navigate('ProductosComprasScreen');
+
+                    showMessage({
+                        message: "El Producto se edito con éxito!",
+                        type: "success",
+                        icon: "success"
+                    });
+
+                    navigation.navigate('ProductosComprasScreen', {
+                        number_compra : number_compra
+                    });
                 }
-            }, 5000)
+            }, 3000)
             
           
 

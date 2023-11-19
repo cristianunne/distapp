@@ -8,9 +8,24 @@ export const campaign_table = "CREATE TABLE IF NOT EXISTS campaign " +
   "fecha_inicio TEXT, fecha_fin TEXT, status INTEGER);"
 
 
+export const stock_camion_campaign_table = "CREATE TABLE IF NOT EXISTS stock_camion_campaign " +
+  "(stock_camion_campaign_id INTEGER PRIMARY KEY AUTOINCREMENT, idstock_camion_campaign INTEGER UNIQUE, campaign_idcampaign INTEGER, camion_idcamion INTEGER, " +
+  "users_idusers INTEGER, " +
+  "FOREIGN KEY(campaign_idcampaign) REFERENCES campaign(idcampaign), " + 
+  "FOREIGN KEY(camion_idcamion) REFERENCES camiones(idcamiones), " + 
+  "FOREIGN KEY(users_idusers) REFERENCES users(idusers));";
+
+  export const stock_camion_campaign_producto_table = "CREATE TABLE IF NOT EXISTS stock_campaign_producto " +
+  "(idstock_campaign_producto_id INTEGER PRIMARY KEY AUTOINCREMENT, idstock_campaign_producto INTEGER UNIQUE, productos_idproductos INTEGER, cantidad INTEGER, " +
+  "created TEXT, modified TEXT, cantidad_initial INTEGER, status INTEGER, stock_camion_campaign_idstock_camion_campaign	INTEGER, cant_transfer INTEGER, " +
+  "FOREIGN KEY(stock_camion_campaign_idstock_camion_campaign) REFERENCES stock_camion_campaign(idstock_camion_campaign), " + 
+  "FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos));";
+
+
 export const camion_table = "CREATE TABLE IF NOT EXISTS camiones " +
   "(camion_id INTEGER PRIMARY KEY AUTOINCREMENT, idcamiones INTEGER UNIQUE, nombre VARCHAR(100), marca VARCHAR(100), " +
   "matricula VARCHAR(45));";
+
 
 export const categories_table = "CREATE TABLE IF NOT EXISTS categories " +
   "(categories_id INTEGER PRIMARY KEY AUTOINCREMENT, idcategories INTEGER UNIQUE, name VARCHAR(100), " + 
@@ -51,12 +66,47 @@ export const productos_comprasstock_table = "CREATE TABLE IF NOT EXISTS empleado
 "(empleado_comprastock_id INTEGER PRIMARY KEY AUTOINCREMENT, idempleado_comprastock INTEGER UNIQUE, " +
 "productos_idproductos INTEGER, comprasstock_idcomprasstock INTEGER, cantidad INTEGER, " + 
 "comprobante VARCHAR(150), status INTEGER DEFAULT 0, observaciones VARCHAR(250), cantidad_comprada INTEGER DEFAULT 0, " + 
-"FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos), " + 
-"FOREIGN KEY(comprasstock_idcomprasstock) REFERENCES compras_stock(idcompras_stock));";
+"FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos) ON DELETE CASCADE, " + 
+"FOREIGN KEY(comprasstock_idcomprasstock) REFERENCES compras_stock(idcompras_stock) ON DELETE CASCADE);";
 
 
+export const cart_session_table = "CREATE TABLE IF NOT EXISTS cart_session " +
+"(id_cart_session INTEGER PRIMARY KEY AUTOINCREMENT, productos_idproductos INTEGER, cantidad INTEGER, " +
+"precio REAL, descuento REAL, " +
+"FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos) ON DELETE CASCADE);";
+
+
+export const ventas_table = "CREATE TABLE IF NOT EXISTS ventas " +
+"(ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, idventas INTEGER UNIQUE, created TEXT, users_idusers INTEGER NOT NULL, " +
+"clientes_idclientes INTEGER NOT NULL, subtotal REAL NOT NULL, descuentos REAL, total REAL NOT NULL, descuento_general REAL" + 
+"pedidos_idpedidos INTEGER, coordenadas TEXT, campaign_idcampaign INTEGER NOT NULL, cuenta_corriente INTEGER NOT NULL, " +
+"is_pay INTEGER NOT NULL, camion_idcamion INTEGER NOT NULL, status INTEGER, " + 
+"FOREIGN KEY(users_idusers) REFERENCES users(idusers) ON DELETE CASCADE, " + 
+"FOREIGN KEY(clientes_idclientes) REFERENCES clientes(idclientes) ON DELETE SET NULL, " + 
+"FOREIGN KEY(campaign_idcampaign) REFERENCES campaign(idcampaign) ON DELETE CASCADE, " + 
+"FOREIGN KEY(camion_idcamion) REFERENCES camiones(idcamiones) ON DELETE SET NULL); "; 
+
+export const productos_ventas_table = "CREATE TABLE IF NOT EXISTS productos_ventas " + 
+"(productos_ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, idproductos_ventas INTEGER UNIQUE, ventas_idventas INTEGER NOT NULL, " +
+"cantidad INTEGER, precio_unidad REAL, descuento_unidad REAL, created TEXT, " +
+"FOREIGN KEY(ventas_idventas) REFERENCES ventas(ventas_id) ON DELETE CASCADE);"; 
+
+
+export const delete_campaign_table = "DELETE FROM campaign";
+export const delete_camiones_table = "DELETE FROM camiones";
+export const delete_categories_table = "DELETE FROM categories";
+export const delete_subcategories_table = "DELETE FROM subcategories";
+export const delete_clientes_table = "DELETE FROM clientes";
+export const delete_productos_table = "DELETE FROM productos";
+export const delete_proveedores_table = "DELETE FROM proveedores";
 export const delete_compras_table = "DELETE FROM compras_stock";
 export const delete_productos_comprasstock_table= "DELETE FROM empleado_comprasstock";
+export const delete_stock_camion_campaign = "DELETE FROM stock_camion_campaign";
+export const delete_stock_campaign_producto = "DELETE FROM stock_campaign_producto";
+
+export const delete_cart_session_table = "DELETE FROM cart_session";
+export const delete_ventas_table = "DELETE FROM ventas";
+export const delete_productos_ventas_table = "DELETE FROM productos_ventas";
 
 
 

@@ -29,7 +29,7 @@ const getSubcategoriesAPI = async () => {
 export const getProductosAPI = async () => {
 
     const productos = await getProductos();
-    console.log(productos);
+    //console.log(productos);
     if (productos != false) {
        return productos;
     }

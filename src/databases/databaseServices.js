@@ -2,7 +2,7 @@ import { openDatabase } from 'expo-sqlite';
 import * as SQLITE from 'expo-sqlite'
 import * as Sharing from 'expo-sharing'
 import * as FileSystem from 'expo-file-system'
-import { camion_table, campaign_table, categories_table, clientes_table, compras_table, productos_comprasstock_table, productos_table, proveedores_table, subcategories_table, users_table } from './querysTables';
+import { camion_table, campaign_table, cart_session_table, categories_table, clientes_table, compras_table, productos_comprasstock_table, productos_table, productos_ventas_table, proveedores_table, stock_camion_campaign_producto_table, stock_camion_campaign_table, subcategories_table, users_table, ventas_table } from './querysTables';
 
 
 export const database_name = 'distapp2.db'; // Add your Database name
@@ -43,6 +43,13 @@ export async function initDatabase() {
 
         await createTables(db, compras_table);
         await createTables(db, productos_comprasstock_table);
+        await createTables(db, cart_session_table);
+
+        await createTables(db, ventas_table);
+        await createTables(db, productos_ventas_table);
+
+        await createTables(db, stock_camion_campaign_table);
+        await createTables(db, stock_camion_campaign_producto_table);
 
         
 
@@ -85,10 +92,12 @@ export async function deleteTables(db, query) {
             },
             function (error) {
                 reject(error.message);
+                return false;
             },
             function () {
                 resolve(true);
                 //console.log('Created database OK');
+
 
             }
         );

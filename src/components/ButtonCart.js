@@ -20,11 +20,10 @@ export default ButtonCart
 
 const styles = StyleSheet.create({
     container: {
-        flex: 0.8,
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         //backgroundColor: '#4BB543',
-       
         borderTopRightRadius: 3,
         borderTopLeftRadius: 3,
         borderBottomRightRadius: 3,

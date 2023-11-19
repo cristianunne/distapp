@@ -6,11 +6,15 @@ import { COLORS, TYPES_BTN } from '../styles/common_styles';
 import { AppContext } from '../Context/ContextApp';
 import { setComprasEmpleado } from '../services/fetching';
 import { updateEstadoEmpleadosComprasStock } from '../databases/Entity/ComprasEntity';
+import { useIsFocused } from '@react-navigation/native';
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 
-const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload, setReload }) => {
+
+const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload, setReload, reload2, setReload2 }) => {
 
     const [isLogin, setIsLogin, user, setUser] = useContext(AppContext);
+    const isFocused = useIsFocused();
 
     const [isOnPress, setIsOnPress] = useState(false);
     const [fechaInicio, setFechaInicio] = useState();
@@ -27,6 +31,7 @@ const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload
     const navigation = useNavigation();
 
     const [user_, setUser_] = useState();
+    const [estadoItem, setEstadoItem] = useState();
 
 
 
@@ -50,12 +55,17 @@ const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload
         prod_compra.status == 2 ? 'Enviado' : null;
         setEstado(sts);
 
+        //console.log(sts);
+
+        setEstadoItem(prod_compra.status);
+
         if(prod_compra.status == 0 || prod_compra.status == 1){
             setCanEdit(true);
         } else {
             setCanEdit(false);
         }
         setUser_(JSON.parse(user));
+     
 
 
     }, [reload]);
@@ -63,10 +73,16 @@ const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload
 
     const onPress = () => {
 
+        
         navigation.navigate('ProductosDetailssScreen',
         {
-            prod_compra
+            prod_compra,
+            number_compra : number_compra
+
         });
+        setReload(!reload);
+       
+       
     }
 
     const onPressIn = () => {
@@ -94,28 +110,28 @@ const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload
         const res = setComprasEmpleado(data);
 
         if(res){
-
             //seteo la el estado del producto
             const res_status = await updateEstadoEmpleadosComprasStock(prod_compra.empleado_comprastock_id, 2);
-
+            setReload2(!reload2);
 
         }
 
 
         setTimeout(()=> {
             setIsLoading(false);
-        }, 5000);
+            showMessage({
+                message: "El Producto se envio con éxito!",
+                type: "success",
+                icon: "success"
+            });
+        }, 3000);
 
        
         if(reload){
             setReload(false);
         } else {
             setReload(true);
-        }
-
-       
-
-    
+        }    
         
     }
 
@@ -148,9 +164,9 @@ const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload
 
                     <View style={styles.box_text_sub_content}>
                         <Text style={styles.text_estado}>Estado: </Text>
-                        <Text style={ prod_compra.status == 0 ? styles.text_details_estado_pedido :  
-                        prod_compra.status == 1 ? styles.text_details_estado_comprado : 
-                        prod_compra.status == 2 ? styles.text_details_estado_enviado : null}>
+                        <Text style={  prod_compra.status == 0 ? styles.text_details_estado_pedido :  
+                         prod_compra.status == 1 ? styles.text_details_estado_comprado : 
+                         prod_compra.status == 2 ? styles.text_details_estado_enviado : null}>
                             
                             {estado != undefined ? (estado) : null}</Text>
                     </View>

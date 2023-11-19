@@ -11,18 +11,19 @@ import { red } from '@mui/material/colors';
 import CardCampaign from '../components/CardCampaign';
 import { getCampaignUser } from '../services/fetching';
 import { getUser, getUserCount } from '../databases/Entity/UsersEntity';
-import { getCampaignCount } from '../databases/Entity/CampaingEntity';
+import { getCampaignCount, getCampaignFromDB } from '../databases/Entity/CampaingEntity';
+import { useIsFocused } from '@react-navigation/native';
 
 
 //const Tab = createBottomTabNavigator();
 
 function Home() {
-
+    const isFocused = useIsFocused();
     const [result, setResult] = useState(false);
 
     const [selectedTab, setSelectedTab] = useState(0)
 
-    const [isLogin, setIsLogin, user, setUser] = React.useContext(AppContext);
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
 
     const [name, setName] = useState();
 
@@ -83,8 +84,21 @@ function Home() {
         if (campaign_count){
             const cant = campaign_count.rows.item(0).cantidad;
 
+            if(cant > 0){
+                const data_campaign = await getCampaignFromDB();
+
+                if(data_campaign){
+                    setCampaignActive(data_campaign.rows.item(0));
+
+                }
+
+                console.log(data_campaign);
+
+            }
+
             //setCantCampaign(cant);
-            console.log(cantCampaign);
+            //console.log('campaign number ' +  cant);
+            setCantCampaign(cant);
         }
 
     
@@ -94,12 +108,6 @@ function Home() {
 
     useEffect(() => {
 
-        //const obj = '{"user_id":1,"idusers":3,"firstname":"Javier","lastname":"Urbano","email":"cris@hotmail.com","photo":"","role":"empleado"}';
-       // console.log("user:");
-        //console.log(user);
-
-        //getUserFromDb();
-
         if(user != null){
             const myobj = JSON.parse(user);
 
@@ -108,17 +116,8 @@ function Home() {
 
             getCampaign_Count();
         }
-           
-        //alert(myobj);
-        //setUser_(...user_, myobj);
-        //console.log(myobj.idusers);
-        //console.log("mensdfsdfrsaje");
-        //traigo la camapana si hay
-        //const campaign_ = getCampaign(myobj.idusers);
-
-        //console.log(campaign);
-        //console.log(user_);
-    });
+        
+    }, [isFocused]);
 
 
     return (
@@ -138,7 +137,7 @@ function Home() {
                 </View>
                </View>
 
-               <CardCampaign cantCampaign={cantCampaign}></CardCampaign>
+               <CardCampaign campaign={campaignActive} cantCampaign={cantCampaign}></CardCampaign>
           
             <Footer />
             

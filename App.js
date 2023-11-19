@@ -6,6 +6,8 @@ import AppNavigator from "./src/AppNavigator";
 import { StrictMode } from 'react';
 import MyProvider from "./src/Context/ContextApp";
 import { initDatabase } from "./src/databases/databaseServices";
+import FlashMessage from "react-native-flash-message";
+
 
 
 
@@ -31,6 +33,7 @@ const App = () => {
   return (
     <MyProvider>
       <AppNavigator dbExist={dbExists}/>
+      <FlashMessage position={"bottom"} />
     </MyProvider>
 
 

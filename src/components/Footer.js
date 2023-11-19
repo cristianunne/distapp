@@ -19,9 +19,13 @@ const goCompras = () => {
 const goProductos = () => {
     navigation.navigate('ProductosInicioScreen');
 }
+
+const goToHome = () => {
+    navigation.navigate('Home');
+}
   return (
     <View style={styles.bottomView}>
-                <TouchableOpacity style={styles.bottonTab}>
+                <TouchableOpacity style={styles.bottonTab} onPress={goToHome}>
                     <Image source={require('../images/home.png')} style={styles.bottomTabIconHome} />
                     <Text style={styles.title}>Inicio</Text>
                 </TouchableOpacity>

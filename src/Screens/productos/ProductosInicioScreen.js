@@ -1,30 +1,86 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native'
+import { View, StyleSheet, SafeAreaView, ScrollView, TextInput } from 'react-native'
 import Header from '../../components/Header'
 import ItemProducto from '../../components/ItemProducto'
 import Footer from '../../components/Footer'
 import { getProductosDB } from '../../databases/Entity/ProductosEntity'
 import { useIsFocused } from '@react-navigation/native';
+import { LoadingModal } from "react-native-loading-modal";
+
+
+
+
+import FlashMessage from "react-native-flash-message";
+import ItemsProductosBox from '../../components/ItemsProductosBox'
 
 const ProductosInicioScreen = () => {
+    const [country, setCountry] = React.useState();
+
+    const [isLoading, setIsLoading] = useState(false);
+
     const [result, setResult] = useState([]);
+
+    const [dataProducto, setDataProducto] = useState();
+    const [dataProductoDinamic, setDataProductoDinamic] = useState();
+    const [busqueda, setBusqueda] = useState('');
+
     const isFocused = useIsFocused();
     const result_ = [];
+    
     const getProductos = async () => {
+        setIsLoading(true);
         const productos = await getProductosDB();
-        for (let i = 0; i < productos.rows.length; i++) {
-            let producto = productos.rows.item(i);
-            
-            result_.push(<ItemProducto key={i} producto={producto} />);
+      
 
+        let data_ = [];
+        if(productos != undefined){
+            for (let i = 0; i < productos.rows.length; i++) {
+        
+                let producto = productos.rows.item(i); 
+                console.log('id que quiero nueov: ' +  producto.idstock_campaign_producto);              
+                data_.push(producto);               
+            }
         }
-        //console.log(productos);
-        setResult(result_);
+
+        setDataProducto(data_);
+        setDataProductoDinamic(data_);
+        
+       
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+        
+    }
+
+    const onChangeBuscar = (value) => {
+
+        if(value != undefined){
+        
+            setBusqueda(value);
+            filter(value);
+        } else {
+            setDataProducto(dataProductoDinamic);
+        }
+       
+
+    }
+
+    const filter = (textBusqueda) => {
+
+        let resultadoFiltro = dataProductoDinamic.filter((elemento) => {
+
+            if(elemento.name.toString().toLowerCase().includes(textBusqueda.toLowerCase())){
+                return elemento;
+            }
+            
+        })
+        setDataProducto(resultadoFiltro);
     }
 
     useEffect(() => {
 
         getProductos();
+        //console.log(dataProducto);
 
     }, [isFocused]);
 
@@ -36,15 +92,33 @@ const ProductosInicioScreen = () => {
                 rightIcon={require('../../images/cart.png')}
             />
 
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
+            <View style={styles.search_box}>
+                   
+            <TextInput
+                            style={styles.input}
+                            onChangeText={onChangeBuscar}
+                            value={busqueda}
+                            placeholder="Buscar"
+                        />
+
+
+            </View>
             <View style={styles.box_main}>
+            
                 <SafeAreaView style={styles.box_content}>
                     <ScrollView style={styles.scrollview}>
-                        <View style={styles.item_box}>
-                            {result}
-                        </View>
+                      
+                            {/*result*/}
+                            <ItemsProductosBox productos={dataProducto} setIsLoading={setIsLoading}>
+
+                            </ItemsProductosBox>
+    
                     </ScrollView>
                 </SafeAreaView>
             </View>
+
+           
 
             <Footer></Footer>
 
@@ -69,7 +143,7 @@ const styles = StyleSheet.create({
     },
 
     box_main: {
-        flex: 0.92,
+        flex: 0.81,
         borderRadius: 10,
         padding: 5,
         flexDirection: 'row',
@@ -77,18 +151,31 @@ const styles = StyleSheet.create({
         margin: 1,
 
     },
+
     box_content: {
         flex: 1,
+       
+    },
 
-    },
-    item_box: {
-        justifyContent: 'flex-start',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        rowGap: 5,
-        columnGap: 7
-    },
     scrollview: {
-        padding: 15
-    }
+        padding: 5,
+      
+    },
+    search_box: {
+        flex: 0.1,
+        flexDirection: 'row',
+        padding: 10,
+        paddingBottom: 0,
+    
+       
+    },
+    input: {
+        flex: 1,
+        height: 35,
+        borderWidth: 0.4,
+        padding: 5,
+        alignSelf: 'center',
+        borderColor: '#888888',
+        backgroundColor: '#ffffff'
+    },
 });

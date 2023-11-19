@@ -51,13 +51,13 @@ export async function insertCompras(data){
    
 }
 
-export async function insertEmpleadoComprasstock(data){
+export async function insertEmpleadoComprasstock(data, status){
     
     const db = SQLITE.openDatabase(database_name);
 
     const query = "INSERT INTO empleado_comprasstock (idempleado_comprastock, productos_idproductos, " + 
-    "comprasstock_idcomprasstock, cantidad, comprobante, observaciones)" + 
-    " VALUES (?, ?, ?, ?, ?, ?);";
+    "comprasstock_idcomprasstock, cantidad, comprobante, observaciones, status, cantidad_comprada)" + 
+    " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     
 
     let promise = new Promise((resolve, reject) => {
@@ -65,11 +65,11 @@ export async function insertEmpleadoComprasstock(data){
         db.transaction(tx => {
             tx.executeSql(query, [data.idempleado_comprastock, data.productos_idproductos, 
                 data.comprasstock_idcomprasstock, data.cantidad, data.comprobante, 
-                data.observaciones], 
+                data.observaciones, status, data.cantidad_comprada], 
                 (_, result) => {
-                    console.log('mmmmsdfsdfsdfsfsdfsdfsdmm');
+                    //console.log('mmmmsdfsdfsdfsfsdfsdfsdmm');
                   
-                    console.log('inserted data success compras empleados');
+                    //console.log('inserted data success compras empleados');
                     // Resovle when the data is successful
             
                     resolve(result);
@@ -77,7 +77,7 @@ export async function insertEmpleadoComprasstock(data){
                    
                     console.log(sqlerror);
                     console.log(err);
-                    console.log('mmmmmm');
+                    //console.log('mmmmmm');
                    
                     //reject();
                     reject(err);
@@ -143,16 +143,16 @@ export async function getComprasStock()
 }
 
 
-export async function getEmpleadosComprasStock()
+export async function getEmpleadosComprasStock(idcomprasstock)
 {
     const db = SQLITE.openDatabase(database_name);
 
     const query = "SELECT * FROM empleado_comprasstock INNER JOIN productos ON " + 
-    "empleado_comprasstock.productos_idproductos = productos.idproductos;";
+    "empleado_comprasstock.productos_idproductos = productos.idproductos WHERE comprasstock_idcomprasstock = ?;";
 
     let promise = new Promise((resolve, reject) => {
         db.transaction(tx => {
-            tx.executeSql(query, [], 
+            tx.executeSql(query, [idcomprasstock], 
                 (_, result) => {
                 
             

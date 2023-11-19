@@ -31,7 +31,7 @@ const CardCampaign = ({campaign, cantCampaign}) => {
        console.log("valor" + cantCampaign);
 
 
-    }, []);
+    });
 
     if (cantCampaign > 0){
         return (

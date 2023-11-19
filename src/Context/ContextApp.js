@@ -11,6 +11,7 @@ const MyProvider = (props) => {
     const [isLogin, setIsLogin] = useState(false);
     const [isDb, setIsDb] = useState(false);
     const [user, setUser] = useState(null);
+    const [campaignActive, setCampaignActive] = useState(null);
 
 
     useState(() => {
@@ -20,7 +21,7 @@ const MyProvider = (props) => {
 
     return(
 
-        <AppContext.Provider value={[isLogin, setIsLogin, user, setUser]}>
+        <AppContext.Provider value={[isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive]}>
             <IsDbContext.Provider value={[isDb, setIsDb]}>
                 {props.children}
             </IsDbContext.Provider>

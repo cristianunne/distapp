@@ -200,7 +200,7 @@ export default function Login() {
   return (
 
     <View style={LoginStyles.container}>
-        <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
+        <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando...'}/>
       <Image source={require('../images/login.png')} style={LoginStyles.logo}>
       </Image>
       <Text style={LoginStyles.title}>

@@ -1,24 +1,70 @@
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Constants from 'expo-constants'
+import { getCartSessionCount } from '../databases/Entity/CartSessionEntity';
+import { useNavigation } from '@react-navigation/native'
 
-const {heiht, width} = Dimensions.get('window');
 
-const Header = ({title, leftIcon, rightIcon, onClickLeftIcon, onClickRightIcon}) => {
-  return (
-    <View style={styles.header}>
-           <TouchableOpacity style={styles.btn}>
+const { heiht, width } = Dimensions.get('window');
+
+const Header = ({ title, leftIcon, onClickLeftIcon }) => {
+
+   
+
+    const navigation = useNavigation();
+
+    const [hasProduct, setHasProduct] = useState(false);
+
+    const getProducts = async () => {
+
+        const res_cantidad = await getCartSessionCount();
+
+        if (res_cantidad != false){
+
+            let number = res_cantidad.rows.item(0);
+
+            if (number.cantidad > 0) {
+                setHasProduct(true)
+            } else {
+                setHasProduct(false)
+            }
+            //console.log("cantidad " + number.cantidad);
+        }
+       
+
+    }
+
+    const onClickRightIcon = () => {
+        navigation.navigate('CartSessionInicioScreen');
+    }
+
+    useEffect(() => {
+        getProducts();
+
+    })
+
+
+
+    return (
+        <View style={styles.header}>
+            <TouchableOpacity style={styles.btn}>
                 <Image source={leftIcon} style={styles.icon} />
-           </TouchableOpacity>
+            </TouchableOpacity>
 
-           <Text style={styles.text_title}>{title}</Text>
+            <Text style={styles.text_title}>{title}</Text>
 
-           <TouchableOpacity style={styles.btn}>
-                <Image source={rightIcon} style={styles.righticon} />
-           </TouchableOpacity>
-    </View>
-  )
+            <TouchableOpacity style={styles.btn} onPress={onClickRightIcon}>
+                {hasProduct ? <Image source={
+                   require('../images/cart.png')
+                } style={styles.righticon_red} /> : 
+                <Image source={
+                    require('../images/cart.png')
+                 } style={styles.righticon} />}
+                
+            </TouchableOpacity>
+        </View>
+    )
 }
 
 
@@ -54,7 +100,12 @@ const styles = StyleSheet.create({
         height: 50,
         tintColor: '#ffffff'
     },
-    text_title:{
+    righticon_red: {
+        width: 50,
+        height: 50,
+        tintColor: '#ff0000'
+    },
+    text_title: {
         color: '#187351',
         justifyContent: 'center',
         alignItems: 'center',

@@ -37,8 +37,12 @@ const ItemCompras = ({number_compra, fechaIni, status}) => {
 
 
     const onPress = () => {
+
+        //tengo que pasarle el id de la compra
        
-        navigation.navigate('ProductosComprasScreen');
+        navigation.navigate('ProductosComprasScreen', {
+            number_compra : number_compra
+        });
     }
 
     const onPressIn = () => {
