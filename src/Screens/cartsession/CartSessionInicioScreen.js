@@ -64,6 +64,7 @@ const CartSessionInicioScreen = () => {
         let descuentos_ = 0;
 
         const productos = await getCartSessionProductos();
+        //console.log(productos);
         
         for (let i = 0; i < productos.rows.length; i++) {
             let producto = productos.rows.item(i);

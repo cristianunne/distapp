@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { View, StyleSheet } from 'react-native'
-import ItemProductoAcceptTranfer from './ItemProductoAcceptTranfer';
+import { getResumenVentasFromDB } from '../../databases/Entity/VentasEntity';
+import VentasRealizadasItem from './VentasRealizadasItem';
 
-const ItemProductoTransferAceptBox = ({productos, setIsLoading, reload, setReload, hasButtons, has_delete}) => {
+const VentasRealizadasBox = ({ ventas, setIsLoading, idcampaign, reload, setReload, sent }) => {
 
     const [result, setResult] = useState([]);
 
+    //console.log(ventas);
 
     const createItems = () => {
-
         let result_ = [];
         let i = 1;
-        if (productos != undefined) {
-
-            productos.map((prod, key) => {
-
-                result_.push(<ItemProductoAcceptTranfer key={key}  producto_tranfer={prod} setIsLoading={setIsLoading} 
-                    reload ={reload} setReload={setReload} hasButtons={hasButtons} has_delete={has_delete}></ItemProductoAcceptTranfer>);
-
+        if (ventas != undefined) {
+            ventas.map((prod, key) => {
+              
+               // console.log(prod);
+               result_.push(<VentasRealizadasItem key={key} venta={prod} sent={sent} reload={reload} setReload={setReload}></VentasRealizadasItem>)
+               
             });
-
             setResult(result_);
+            i++;
 
         }
 
@@ -28,13 +28,10 @@ const ItemProductoTransferAceptBox = ({productos, setIsLoading, reload, setReloa
 
 
     useEffect(() => {
-      
-        //console.log(productos);
-        
         createItems();
-     
 
-    }, [productos])
+    }, [ventas]);
+
 
     return (
         <View>
@@ -46,11 +43,10 @@ const ItemProductoTransferAceptBox = ({productos, setIsLoading, reload, setReloa
     )
 }
 
-export default ItemProductoTransferAceptBox
-
+export default VentasRealizadasBox
 
 const styles = StyleSheet.create({
- 
+
     item_box: {
         justifyContent: 'flex-start',
         flexDirection: 'row',
@@ -58,6 +54,6 @@ const styles = StyleSheet.create({
         rowGap: 1,
         columnGap: 4,
         paddingBottom: 20,
-    
+
     },
-  });
+});

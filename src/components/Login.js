@@ -10,7 +10,7 @@ import { AppContext } from '../Context/ContextApp';
 import { getUser, getUserCount, insertUser } from '../databases/Entity/UsersEntity';
 import { LoadingModal } from "react-native-loading-modal";
 
-
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 
 export default function Login() {
@@ -76,15 +76,18 @@ export default function Login() {
       } else {
         //traigo el usuario y agrego al context sus datos
         //console.log(user_count.rows.item(0).cantidad)
+      
         const user_data = await getUser();
 
+
+        
 
         setDataToContext(user_data)
 
         setTimeout(() => {
           setIsLoading(false);
           navigation.push('Home');
-        }, 5000);
+        }, 3000);
 
 
         
@@ -129,19 +132,23 @@ export default function Login() {
         setValidatePassword(true);
       }
     }
-    //console.log("esta logueado LOGIN " + isLogin);
-    //setIsLogin(true);
 
 
-    /*if (isLogin) {
+    if (isLogin) {
       navigation.navigate('Home');
-    }*/
+    }
 
 
   }, [email, password, isLogin])
 
 
   const onPressButton = async () => {
+
+    showMessage({
+      message: "INicio de login!",
+      type: "success",
+      icon: "success"
+    });
 
 
     if (validate && validatePassword) {
@@ -152,45 +159,45 @@ export default function Login() {
       const res = await sessionAPI(email, password);
       if (!res) {
         setIsSesion(false);
+        setIsLoading(false);
+        showMessage({
+          message: "NOOOn!",
+          type: "success",
+          icon: "success"
+        });
+   
       } else {
+        showMessage({
+          message: "SIIII!",
+          type: "success",
+          icon: "success"
+        });
         setIsSesion(true);
         //mando a guardar el usuario creado
         //console.log(res);
         saveDataUser(res);
+        setIsLoading(false);
 
       }
+    } else {
+      showMessage({
+        message: "dssgsdgsdgsdgsdgsdgsdg!",
+        type: "success",
+        icon: "success"
+      });
     }
   }
 
 
   const saveDataUser = async (data) => {
 
-    /*let data_ = {
-      "active": true,
-      "created": null,
-      "email": "cris@hotmail.com",
-      "firstname": "Javier",
-      "folder": null,
-      "idusers": 9,
-      "lastname": "Urbano",
-      "modified": null,
-      "photo": "",
-      "role": "empleado",
-    };*/
+
 
     const res = await insertUser(data);
     if (res) {
     
       const re = await getUserFromDb()
       setIsLogin(true);
-
-      
-      //console.log(isLogin);
-      //seteo el user de appcontext
-
-      //traigo los datos
-
-      //setUser(res);
 
     }
 

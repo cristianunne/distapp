@@ -1,0 +1,72 @@
+<View style={styles.container_scrollview}>
+     
+                <ScrollView>
+                    <View style={[styles.box_welcome, styles.elevation]}>
+                        <View style={styles.box_hand}>
+                            <Image source={require('../../images/dinero.png')} style={styles.bottomTabIcon} />
+                        </View>
+                        <View style={styles.box_saludo}>
+                            <Text style={styles.title}>Subtotal (Efectivo)</Text>
+                            <Text style={styles.textuser}>$ {subtotal != null ?
+                                subtotal.format(2, 3, '.', ',') : 0}</Text>
+                        </View>
+                    </View>
+
+                    <View style={[styles.box_descuento, styles.elevation]}>
+                        <View style={styles.box_hand}>
+                            <Image source={require('../../images/descuentos.png')} style={styles.bottomTabIcon} />
+                        </View>
+                        <View style={styles.box_saludo}>
+                            <Text style={styles.title_descuento}>Descuentos (Efectivo)</Text>
+                            <Text style={styles.textuser_descuento}> $ {descuentos != null ?
+                                descuentos.format(2, 3, '.', ',') : 0}</Text>
+                        </View>
+                    </View>
+
+                    <View style={[styles.box_total, styles.elevation]}>
+                        <View style={styles.box_hand}>
+                            <Image source={require('../../images/dinero_total.png')} style={styles.bottomTabIcon} />
+                        </View>
+                        <View style={styles.box_saludo}>
+                            <Text style={styles.title_total}>Total (Efectivo)</Text>
+                            <Text style={styles.textuser_total}>$ {total != null ?
+                                total.format(2, 3, '.', ',') : 0}</Text>
+                        </View>
+                    </View>
+
+                    <View style={[styles.box_subtotal_cc, styles.elevation]}>
+                        <View style={styles.box_hand}>
+                            <Image source={require('../../images/dinero.png')} style={styles.bottomTabIcon} />
+                        </View>
+                        <View style={styles.box_saludo}>
+                            <Text style={styles.title}>Subtotal (CC)</Text>
+                            <Text style={styles.textuser}>$ {subtotal != null ?
+                                subtotal.format(2, 3, '.', ',') : 0}</Text>
+                        </View>
+                    </View>
+
+                    <View style={[styles.box_descuento_cc, styles.elevation]}>
+                        <View style={styles.box_hand}>
+                            <Image source={require('../../images/descuentos.png')} style={styles.bottomTabIcon} />
+                        </View>
+                        <View style={styles.box_saludo}>
+                            <Text style={styles.title_descuento_cc}>Descuentos (CC)</Text>
+                            <Text style={styles.textuser_descuento_cc}> $ {descuentos != null ?
+                                descuentos.format(2, 3, '.', ',') : 0}</Text>
+                        </View>
+                    </View>
+
+                    <View style={[styles.box_total_cc, styles.elevation]}>
+                        <View style={styles.box_hand}>
+                            <Image source={require('../../images/dinero_total.png')} style={styles.bottomTabIcon} />
+                        </View>
+                        <View style={styles.box_saludo}>
+                            <Text style={styles.title_total_cc}>Total (CC)</Text>
+                            <Text style={styles.textuser_total_cc}>$ {total != null ?
+                                total.format(2, 3, '.', ',') : 0}</Text>
+                        </View>
+                    </View>
+                </ScrollView>
+
+
+            </View>

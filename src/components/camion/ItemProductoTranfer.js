@@ -5,7 +5,8 @@ import { showMessage, hideMessage } from "react-native-flash-message";
 import NumericInput from 'react-native-numeric-input'
 import ButtonView from '../ButtonView';
 import { COLORS, TYPES_BTN } from '../../styles/common_styles';
-import { uploadTransferProductoCamion } from '../../services/fetching';
+import { getProductosStockFetch, uploadTransferProductoCamion } from '../../services/fetching';
+import { deleteStockCampaignProductoById, getStockCampaignProductoById, insertStockCampaignProductoToDB, updateStockCampaignProductoToDB } from '../../databases/Entity/StockCampaignProductoEntity';
 
 const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_stock_camion, camion_origen, camion_destino, reload, setReload }) => {
 
@@ -58,11 +59,47 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
 
             let idstock_campaign_producto = producto.stock_campaign_producto.idstock_campaign_producto;
 
+           
+
             let resul = await uploadTransferProductoCamion(idcampaign, camion_origen, camion_destino, idstock_campaign_producto, idcampaing_stock_camion,
                 idproducto, numberProductos);
 
 
             //actualizo el stock local
+
+            const productos_aprob = await getProductosAprobados();
+
+            //let res_eliminar = await eliminarProductoStockDB();
+
+            if(productos_aprob != false && productos_aprob != null){
+
+                for (item of productos_aprob) {
+
+
+                    let existe = await getExistProductoStock(item.stock_campaign_producto.idstock_campaign_producto);
+                   
+                    //console.log('actualizo');
+                    if(existe){
+                        //nada
+                        //actualizo los productos
+                        //primero elimino 
+                    
+                        let res = updateProductoStockDB(item);
+                        console.log('actualizo');
+                      
+
+                    } else {
+                        //inserto
+                        console.log('no existe, agrego');
+                        let res = insertProductoStockToDB(item);
+
+                        
+                    }
+                    //console.log(item.stock_campaign_producto.idstock_campaign_producto);
+                
+                }
+                 
+            }
 
 
 
@@ -81,10 +118,78 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
             }, 3000);
 
         }
+    }
 
 
+    const getProductosAprobados = async () => {
+
+       
+        const productos = await getProductosStockFetch(idcampaign, idcampaing_stock_camion);
+       
+       
+        //setDataProducto(productos);
+        //setDataProductoDinamic(productos);
+   
+        return productos;
+    }
 
 
+    const eliminarProductoStockDB = async () => {
+ 
+        let resul = await deleteStockCampaignProductoById(idcampaing_stock_camion);
+        return resul;
+
+    }
+
+    const getExistProductoStock = async (idstock_campaign_producto) => {
+
+        const res = await getStockCampaignProductoById(idstock_campaign_producto);
+        //console.log(res);
+        if (res != false)
+        {
+           
+            if(res.rows.length > 0){
+                return true;
+            }
+            
+        }
+        return false;
+
+    }
+
+    const updateProductoStockDB = async (producto_stock) => {
+
+        let data = {
+            idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
+            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            modified : producto_stock.stock_campaign_producto.modified,
+            cant_transfer: producto_stock.stock_campaign_producto.cant_transfer
+        }
+
+        let resul = await updateStockCampaignProductoToDB(data);
+        //console.log(resul);
+
+        return resul;
+
+    }
+
+    const insertProductoStockToDB = async (producto_stock) => {
+
+        let data = {
+            idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
+            productos_idproductos : producto_stock.stock_campaign_producto.productos_idproductos,
+            stock_camion_campaign_idstock_camion_campaign : producto_stock.stock_campaign_producto.stock_camion_campaign_idstock_camion_campaign,
+            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            cantidad_initial : producto_stock.stock_campaign_producto.cantidad_initial,
+            created : producto_stock.stock_campaign_producto.created,
+            modified : producto_stock.stock_campaign_producto.modified,
+            status : producto_stock.stock_campaign_producto.status,
+            cant_transfer: producto_stock.stock_campaign_producto.cant_transfer
+        }
+
+        let resul = await insertStockCampaignProductoToDB(data);
+
+        return resul;
     }
 
     useEffect(() => {

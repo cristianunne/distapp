@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { View, StyleSheet, Text, ScrollView, Alert } from 'react-native'
+import React, { useState, useEffect, useCallback } from 'react'
+import { View, StyleSheet, Text, ScrollView, Alert, Button, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import Header from '../../components/Header';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,22 +8,44 @@ import ButtonAction from '../../components/ButtonAction';
 import { TYPES_BTN } from '../../styles/common_styles';
 import { AppContext } from '../../Context/ContextApp';
 import { showMessage, hideMessage } from "react-native-flash-message";
-import { insertVentasToDB } from '../../databases/Entity/VentasEntity';
-import { insertProductosVentasToDB } from '../../databases/Entity/ProductosVentasEntity';
-import { actualizarOnlyStockCampaignProductoToDB } from '../../databases/Entity/StockCampaignProductoEntity';
-import { database_name, deleteTables } from '../../databases/databaseServices';
-import { deleteProductoFromCartSessionDB } from '../../databases/Entity/CartSessionEntity';
-import { delete_cart_session_table } from '../../databases/querysTables';
-import * as SQLITE from 'expo-sqlite'
 import { LoadingModal } from "react-native-loading-modal";
+import { getProductosVentasById } from '../../databases/Entity/ProductosVentasEntity';
+import URLS from '../../services/urls';
 
 
 
 
-export const VentaFinalScreen = ({ route }) => {
+const OpenURLButton = ({ url, children }) => {
+    const handlePress = useCallback(async () => {
+        // Checking if the link is supported for links with custom URL scheme.
+        const supported = await Linking.canOpenURL(url);
+
+        if (supported) {
+            // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+            // by some browser in the mobile
+            await Linking.openURL(url);
+        } else {
+            Alert.alert(`Don't know how to open this URL: ${url}`);
+        }
+    }, [url]);
+
+    return <Button title={children} onPress={handlePress} />;
+
+
+};
+
+
+const VentasResumenScreen = ({ route }) => {
+
+    const { venta } = route.params;
+    console.log(venta);
+
+    const print_url = URLS.PRINT_URL + venta.ventas_idventas;
 
     const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, idcamion, setIdcamion] = React.useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
+    const [items, setItems] = useState();
+    const items_table = [];
 
     /**
         * Number.prototype.format(n, x, s, c)
@@ -40,35 +62,33 @@ export const VentaFinalScreen = ({ route }) => {
         return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
     };
 
-    const navigation = useNavigation();
+    const createItems = async () => {
 
-    const productos = route.params.productos;
-    const cliente = route.params.clientes;
-    const descuento_gen = route.params.descuento_general != null ? parseFloat(route.params.descuento_general) : 0;
-    const subtotal = route.params.subtotal;
-    const descuento_ = route.params.descuento;
-    const total = route.params.total - descuento_gen;
+        //tengo que traer los productos uniendo las tablas
 
-    const type_pago = route.params.type_pago;
+        const prod_ventas = await getProductosVentasById(venta.ventas_id);
 
-    const [items, setItems] = useState();
+        //console.log(prod_ventas);
 
-    const items_table = [];
+        let productos = [];
+        for (let j = 0; j < prod_ventas.rows.length; j++) {
 
-    const createItems = () => {
+            productos.push(prod_ventas.rows.item(j));
+
+        }
+
+
         let i = 1;
-        console.log(productos);
         for (item of productos) {
             let sub_item = [];
-            //console.log(item);
 
-            let total = (item.cart_s_cantidad * item.cart_s_precio) - (item.cart_s_cantidad * item.cart_s_descuento);
+            let total = (item.cantidad * item.precio_unidad) - (item.cantidad * item.descuento_unidad);
             //console.log(item.cantidad);
             sub_item.push(<View style={styles.row} key={i}>
                 <View style={styles.column_prod}><Text style={styles.text_row_head}>{item.name + ' (' + item.content + ' ' + item.unidad + ')'}</Text></View>
-                <View style={styles.column_cantidad}><Text style={styles.text_row_head}>{item.cart_s_cantidad}</Text></View>
-                <View style={styles.column_precio}><Text style={styles.text_row_head}>{item.cart_s_precio != null ? item.cart_s_precio.format(2, 3, '.', ',') : 0}</Text></View>
-                <View style={styles.column_desc}><Text style={styles.text_row_head}>{item.cart_s_descuento != null ? item.cart_s_descuento.format(2, 3, '.', ',') : 0}</Text></View>
+                <View style={styles.column_cantidad}><Text style={styles.text_row_head}>{item.cantidad}</Text></View>
+                <View style={styles.column_precio}><Text style={styles.text_row_head}>{item.precio_unidad != null ? item.precio_unidad.format(2, 3, '.', ',') : 0}</Text></View>
+                <View style={styles.column_desc}><Text style={styles.text_row_head}>{item.descuento_unidad != null ? item.descuento_unidad.format(2, 3, '.', ',') : 0}</Text></View>
                 <View style={styles.column_tot}><Text style={styles.text_row_head}>{total != null ? total.format(2, 3, '.', ',') : 0}</Text></View></View>
 
             );
@@ -84,150 +104,30 @@ export const VentaFinalScreen = ({ route }) => {
 
     }
 
-    const vender = async () => {
-
-        const myobj = JSON.parse(user);
-
-        Alert.alert('Vender', '¿Desea Concretar la Venta?', [
-            {
-                text: 'Cancelar',
-                onPress: () => console.log('Cancel Pressed'),
-                style: 'cancel',
-            },
-            {
-                text: 'Aceptar', onPress: async () => {
-
-                
-                    if (campaignActive.idcampaign == null) {
-
-                        showMessage({
-                            message: "No existe Campaña activa.",
-                            type: "danger",
-                            icon: "danger"
-                        });
-            
-                    } else if (idcamion == null) {
-                        showMessage({
-                            message: "No existe Camion asignado.",
-                            type: "danger",
-                            icon: "danger"
-                        });
-                    } else {
-                        setIsLoading(true);
-            
-                        let data = {
-                            created: new Date().toLocaleString(),
-                            users_idusers: myobj.idusers,
-                            clientes_idclientes: cliente.idclientes,
-                            subtotal: subtotal,
-                            descuentos: descuento_,
-                            total: total,
-                            descuento_general: descuento_gen,
-                            pedidos_idpedidos: null,
-                            coordenadas: null,
-                            campaign_idcampaign: campaignActive.idcampaign,
-                            cuenta_corriente: type_pago == 2 ? 1 : 0,
-                            is_pay: type_pago == 1 ? 1 : 0,
-                            camion_idcamion: idcamion,
-                            status: 0
-                        }
-                        //console.log(data);
-            
-                        const save_venta = await insertVentasToDB(data);
-                        console.log(save_venta.insertId);
-            
-                        if (save_venta != false) {
-            
-                            //aca guardo los productos
-            
-                            //let total = (item.cart_s_cantidad * item.cart_s_precio) - (item.cart_s_cantidad * item.cart_s_descuento);
-            
-                            for (item of productos) {
-                                let data_prod = {
-                                    ventas_idventas: save_venta.insertId,
-                                    productos_idproductos: item.idproductos,
-                                    cantidad: item.cart_s_cantidad,
-                                    precio_unidad: item.cart_s_precio,
-                                    descuento_unidad: item.cart_s_descuento,
-                                    created: new Date().toLocaleString(),
-                                    idstock_campaign_producto : item.idstock_campaign_producto
-                                }
-            
-                                const res_ = await insertProductosVentasToDB(data_prod);
-                                //descuento los stockde productos
-                                let idstock_campaign_producto = item.idstock_campaign_producto;
-                                let stock = {
-                                    cantidad : item.cart_s_cantidad, 
-                                    modified: new Date().toLocaleString(), 
-                                    idstock_campaign_producto : idstock_campaign_producto
-                                }
-                                //console.log(stock);
-            
-                                let res_resta = await actualizarOnlyStockCampaignProductoToDB(stock);
-            
-                            }
-            
-                            //limpio el carrito
-                            const db = SQLITE.openDatabase(database_name);
-                            const clean_cart = await deleteTables(db, delete_cart_session_table);
-            
-            
-                            setTimeout(() => {
-                                setIsLoading(false);
-                                showMessage({
-                                    message: "La Venta se ha realizado correctamente. Envíe al Servidor!.",
-                                    type: "success",
-                                    icon: "success"
-                                });
-            
-                                navigation.navigate('Home');
-            
-                            }, 3000)
-            
-                        
-            
-                            //hago un navigate a inicio
-            
-                        } else {
-                            setIsLoading(false);
-                            showMessage({
-                                message: "No se pudo generar la Venta. Intente nuevamente!.",
-                                type: "danger",
-                                icon: "danger"
-                            });
-                        }
-            
-            
-            
-                    }
-
-                }
-            },
-        ]);
-
-      
 
 
-
-
-    }
-
-
-
-    useState(() => {
+    useEffect(() => {
         createItems();
 
-        //let ahora = new Date();
-        //console.log(new Date().toLocaleString());
 
-    }, [items]);
+    }, [])
+
+
+
+
+
+
+
 
     return (
         <View style={styles.container}>
-            <Header title={'Realizar Venta'} leftIcon={require('../../images/home.png')}
+            <Header title={'Resumen de Venta'} leftIcon={require('../../images/home.png')}
             />
-             <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
-
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            {venta.status == 1 ? 
+                <View style={styles.print_container}>
+                    <OpenURLButton url={print_url}>Imprimir</OpenURLButton>
+                </View> : null }
             <View style={styles.sub_container}>
                 <View style={styles.box_message}>
                     <View style={styles.icon_info}>
@@ -239,32 +139,32 @@ export const VentaFinalScreen = ({ route }) => {
                     <View style={styles.text_content}>
                         <View style={styles.text_sub_content}>
                             <Text style={styles.label_cliente}>Apellido: </Text>
-                            <Text style={styles.text_item}>{cliente.apellido}</Text>
+                            <Text style={styles.text_item}>{venta.apellido}</Text>
                         </View>
 
                         <View style={styles.text_sub_content}>
                             <Text style={styles.label_cliente}>Nombre: </Text>
-                            <Text style={styles.text_item}>{cliente.nombre}</Text>
+                            <Text style={styles.text_item}>{venta.nombre}</Text>
                         </View>
 
                         <View style={styles.text_sub_content}>
                             <Text style={styles.label_cliente}>Comercio: </Text>
-                            <Text style={styles.text_item}>{cliente.shop_name}</Text>
+                            <Text style={styles.text_item}>{venta.shop_name}</Text>
                         </View>
 
                         <View style={styles.text_sub_content}>
                             <Text style={styles.label_cliente}>Dirección: </Text>
-                            <Text style={styles.text_item}>{cliente.direccion + ' ' + cliente.altura}</Text>
+                            <Text style={styles.text_item}>{venta.direccion + ' ' + venta.altura}</Text>
                         </View>
 
                         <View style={styles.text_sub_content}>
                             <Text style={styles.label_cliente}>Telefono: </Text>
-                            <Text style={styles.text_item}>{cliente.telefono}</Text>
+                            <Text style={styles.text_item}>{venta.telefono}</Text>
                         </View>
 
                         <View style={styles.text_sub_content}>
                             <Text style={styles.label_cliente}>Localidad: </Text>
-                            <Text style={styles.text_item}>{cliente.localidad}</Text>
+                            <Text style={styles.text_item}>{venta.localidad}</Text>
                         </View>
 
                     </View>
@@ -274,6 +174,7 @@ export const VentaFinalScreen = ({ route }) => {
 
 
             <View style={styles.productos_container}>
+            
                 <View style={styles.productos_table_container}>
                     <ScrollView>
                         <View style={styles.table_head}>
@@ -287,14 +188,11 @@ export const VentaFinalScreen = ({ route }) => {
                         {items}
 
 
-
-
-
-
-
                     </ScrollView>
 
                 </View>
+
+
             </View>
 
             <View style={styles.box_resumen}>
@@ -303,16 +201,16 @@ export const VentaFinalScreen = ({ route }) => {
                         <Text style={styles.label}>Subtotal: </Text>
                         <Text style={styles.prices_text_value}>
                             $
-                            {subtotal != null ?
-                                subtotal.format(2, 3, '.', ',') : 0}
+                            {venta.subtotal != null ?
+                                venta.subtotal.format(2, 3, '.', ',') : 0}
                         </Text>
                     </View>
                     <View style={styles.box_sub_resumen}>
                         <Text style={styles.label}>Descuentos: </Text>
                         <Text style={styles.descuento_text_value}>
                             $
-                            {descuento_ != null ?
-                                descuento_.format(2, 3, '.', ',') : 0}
+                            {venta.descuentos != null ?
+                                venta.descuentos.format(2, 3, '.', ',') : 0}
                         </Text>
 
                     </View>
@@ -321,8 +219,8 @@ export const VentaFinalScreen = ({ route }) => {
                         <Text style={styles.label}>Otros Descuentos: </Text>
                         <Text style={styles.descuento_text_value}>
                             $
-                            {descuento_gen != null ?
-                                descuento_gen.format(2, 3, '.', ',') : 0}
+                            {venta.descuento_geneneral != null ?
+                                venta.descuento_geneneral.format(2, 3, '.', ',') : 0}
                         </Text>
 
                     </View>
@@ -330,24 +228,16 @@ export const VentaFinalScreen = ({ route }) => {
                         <Text style={styles.label_total}>Total: </Text>
                         <Text style={styles.label_total}>
                             $
-                            {total != null ?
-                                total.format(2, 3, '.', ',') : 0}
+                            {venta.total != null ?
+                                venta.total.format(2, 3, '.', ',') : 0}
                         </Text>
                     </View>
 
-                    
-                </View>
-
-                <View style={styles.box_sub_resumen_main}>
-                    <View style={styles.box_btn}>
-                        <View style={styles.box_sub_btn}>
-                            <ButtonAction title={'Vender'} type={TYPES_BTN.SUCCESS} onPress={vender}></ButtonAction>
-                        </View>
-
-                    </View>
 
                 </View>
+
             </View>
+
 
             <Footer></Footer>
 
@@ -355,13 +245,22 @@ export const VentaFinalScreen = ({ route }) => {
     )
 }
 
+export default VentasResumenScreen
+
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#ededed',
 
     },
+    print_container: {
+        marginTop: 5,
 
+    },
+    btn_print: {
+
+    },
     sub_container: {
         flexDirection: 'column',
         flex: 0.23,

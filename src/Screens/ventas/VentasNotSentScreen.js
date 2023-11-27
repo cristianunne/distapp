@@ -3,56 +3,56 @@ import { View, StyleSheet, SafeAreaView, ScrollView, TextInput } from 'react-nat
 import Header from '../../components/Header'
 
 import Footer from '../../components/Footer'
-import { getProductosDB } from '../../databases/Entity/ProductosEntity'
+
 import { useIsFocused } from '@react-navigation/native';
 import { LoadingModal } from "react-native-loading-modal";
 import { AppContext } from '../../Context/ContextApp'
-import { getProductosTransferenciasCamionFetch } from '../../services/fetching'
-import ItemProductoAcceptTranfer from '../../components/camion/ItemProductoAcceptTranfer'
-import ItemProductoTransferAceptBox from '../../components/camion/ItemProductoTransferAceptBox'
+import { getResumenVentasAllFromDB, getResumenVentasFromDB, getResumenVentasNotSentFromDB } from '../../databases/Entity/VentasEntity';
+import VentasRealizadasBox from '../../components/ventas/VentasRealizadasBox';
 
-const CamionesTransferenciasAceptarScreen = ({route}) => {
+const VentasNotSentScreen = ({route}) => {
     const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
-    const [dataProducto, setDataProducto] = useState();
-    const [dataProductoDinamic, setDataProductoDinamic] = useState();
+    const [dataProducto, setDataProducto] = useState([]);
+    const [dataProductoDinamic, setDataProductoDinamic] = useState([]);
     const [busqueda, setBusqueda] = useState('');
-
-
-    const { idcamion, idcampaign } = route.params;
 
     const isFocused = useIsFocused();
     const [reload, setReload] = useState(false);
 
 
-
-    const getProductosTransferenciasCamionAPI = async () => {
-
+    const getVentasRealizadas = async () => {
         setIsLoading(true);
-      
-        const resul = await getProductosTransferenciasCamionFetch(idcampaign, idcamion);
-        setDataProducto(resul);
-        setDataProductoDinamic(resul);
-        setIsLoading(false);
-    
+        const resumen_ventas = await getResumenVentasNotSentFromDB();
+        //console.log(resumen_ventas);
 
+        let vent = [];
+
+        for(let i = 0; i < resumen_ventas.rows.length; i++){
+
+            vent.push( resumen_ventas.rows.item(i));
+
+        }
+
+        setDataProducto(vent);
+        setDataProductoDinamic(vent);
+        setIsLoading(false);
         
+        //console.log(dataProducto);
+
     }
 
 
     useEffect(() => {
  
-       
-
-        getProductosTransferenciasCamionAPI();
-
+    
+       getVentasRealizadas();
 
     }, [isFocused, reload]);
 
-
     return (
         <View style={styles.container}>
-            <Header title={'Productos de Transferencia'} leftIcon={require('../../images/home.png')}
+            <Header title={'Ventas Realizadas'} leftIcon={require('../../images/home.png')}
                 rightIcon={require('../../images/cart.png')}
             />
 
@@ -73,10 +73,7 @@ const CamionesTransferenciasAceptarScreen = ({route}) => {
                 <SafeAreaView style={styles.box_content}>
                     <ScrollView style={styles.scrollview}>
 
-
-                        <ItemProductoTransferAceptBox productos={dataProducto} setIsLoading={setIsLoading} reload ={reload} 
-                        setReload={setReload} has_delete={false}></ItemProductoTransferAceptBox>
-
+                    <VentasRealizadasBox ventas={dataProducto} sent={true} reload={reload} setReload={setReload}></VentasRealizadasBox>
                     </ScrollView>
                 </SafeAreaView>
             </View>
@@ -88,7 +85,7 @@ const CamionesTransferenciasAceptarScreen = ({route}) => {
     )
 }
 
-export default CamionesTransferenciasAceptarScreen
+export default VentasNotSentScreen
 
 const styles = StyleSheet.create({
     container: {

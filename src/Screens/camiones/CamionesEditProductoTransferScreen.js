@@ -56,6 +56,8 @@ const CamionesEditProductoTransferScreen = ({ route, navigation }) => {
                     let idcampaign = prod_transfer.idcampaign;
                     let productos_idproductos = prod_transfer.productos_idproductos;
 
+                    //necesito la cantidad inicial enviada  porque el empleado registro menos
+
                     setIsLoading(true);
                     const resul = await acceptTransferCamionFetch(idtransferencia_stock, idstock_campaign_producto, cantidad, idcamion, idcampaign, productos_idproductos)
                    

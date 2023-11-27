@@ -77,8 +77,8 @@ export const cart_session_table = "CREATE TABLE IF NOT EXISTS cart_session " +
 
 
 export const ventas_table = "CREATE TABLE IF NOT EXISTS ventas " +
-"(ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, idventas INTEGER UNIQUE, created TEXT, users_idusers INTEGER NOT NULL, " +
-"clientes_idclientes INTEGER NOT NULL, subtotal REAL NOT NULL, descuentos REAL, total REAL NOT NULL, descuento_general REAL" + 
+"(ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, ventas_idventas INTEGER UNIQUE, created TEXT, users_idusers INTEGER NOT NULL, " +
+"clientes_idclientes INTEGER NOT NULL, subtotal REAL NOT NULL, descuentos REAL, total REAL NOT NULL, descuento_general REAL, " + 
 "pedidos_idpedidos INTEGER, coordenadas TEXT, campaign_idcampaign INTEGER NOT NULL, cuenta_corriente INTEGER NOT NULL, " +
 "is_pay INTEGER NOT NULL, camion_idcamion INTEGER NOT NULL, status INTEGER, " + 
 "FOREIGN KEY(users_idusers) REFERENCES users(idusers) ON DELETE CASCADE, " + 
@@ -87,8 +87,8 @@ export const ventas_table = "CREATE TABLE IF NOT EXISTS ventas " +
 "FOREIGN KEY(camion_idcamion) REFERENCES camiones(idcamiones) ON DELETE SET NULL); "; 
 
 export const productos_ventas_table = "CREATE TABLE IF NOT EXISTS productos_ventas " + 
-"(productos_ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, idproductos_ventas INTEGER UNIQUE, ventas_idventas INTEGER NOT NULL, " +
-"cantidad INTEGER, precio_unidad REAL, descuento_unidad REAL, created TEXT, " +
+"(productos_ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, ventas_idventas INTEGER NOT NULL, productos_idproductos INTEGER NOT NULL, " +
+"cantidad INTEGER, precio_unidad REAL, descuento_unidad REAL, created TEXT, idstock_campaign_producto INTEGER, " +
 "FOREIGN KEY(ventas_idventas) REFERENCES ventas(ventas_id) ON DELETE CASCADE);"; 
 
 
@@ -107,6 +107,8 @@ export const delete_stock_campaign_producto = "DELETE FROM stock_campaign_produc
 export const delete_cart_session_table = "DELETE FROM cart_session";
 export const delete_ventas_table = "DELETE FROM ventas";
 export const delete_productos_ventas_table = "DELETE FROM productos_ventas";
+
+export const delete_users_table = "DELETE FROM users";
 
 
 

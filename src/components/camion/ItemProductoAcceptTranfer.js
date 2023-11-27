@@ -5,11 +5,12 @@ import { showMessage, hideMessage } from "react-native-flash-message";
 import NumericInput from 'react-native-numeric-input'
 import ButtonView from '../ButtonView';
 import { COLORS, TYPES_BTN } from '../../styles/common_styles';
-import { acceptTransferCamionFetch } from '../../services/fetching';
+import { acceptTransferCamionFetch, deleteProductosTransferenciasByCamionFetch, getProductosStockFetch } from '../../services/fetching';
 
 import { useNavigation } from '@react-navigation/native'
+import { getStockCampaignProductoById, insertStockCampaignProductoToDB, updateStockCampaignProductoToDB } from '../../databases/Entity/StockCampaignProductoEntity';
 
-const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign, reload, setReload }) => {
+const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign, reload, setReload, hasButtons, has_delete }) => {
     const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
     const navigation = useNavigation();
 
@@ -35,7 +36,7 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
 
         //esto va a otro screen que modifica el total y envia
         navigation.navigate('CamionesEditProductoTransferScreen', {
-           producto_tranfer
+            producto_tranfer
         });
 
 
@@ -72,14 +73,16 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
 
                     setIsLoading(true);
                     const resul = await acceptTransferCamionFetch(idtransferencia_stock, idstock_campaign_producto, cantidad, idcamion, idcampaign, productos_idproductos)
-                   
+
+                    //actualizo el stock local
+
+
 
                     setTimeout(() => {
 
                         if (resul) {
 
                             let rel = !reload;
-
                             setReload(rel)
                         }
 
@@ -100,6 +103,145 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
     }
 
 
+    const deleteTransfer = async () => {
+
+        Alert.alert('Consulta', '¿Desea Eliminar la Transferencia del Producto?', [
+            {
+                text: 'Cancelar',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+            {
+                text: 'Aceptar', onPress: async () => {
+
+                
+                    setIsLoading(true);
+                    const resul = await deleteProductosTransferenciasByCamionFetch(producto_tranfer.idtransferencia_stock, producto_tranfer.idstock_campaign_producto);
+                    //actualizo el stock local
+                    const productos_aprob = await getProductosAprobados();
+
+                    if(productos_aprob != false && productos_aprob != null){
+
+                        for (item of productos_aprob) {
+
+
+                            let existe = await getExistProductoStock(item.stock_campaign_producto.idstock_campaign_producto);
+                           
+                            //console.log('actualizo');
+                            if(existe){
+                                //nada
+                                //actualizo los productos
+                                //primero elimino 
+                            
+                                let res = updateProductoStockDB(item);
+                                console.log('actualizo');
+                              
+                            } else {
+                                //inserto
+                                console.log('no existe, agrego');
+                                let res = insertProductoStockToDB(item);
+        
+                                
+                            }
+                            //console.log(item.stock_campaign_producto.idstock_campaign_producto);
+                        
+                        }
+
+                    }
+                   
+
+                    setTimeout(() => {
+
+                        if (resul) {
+
+                            let rel = !reload;
+
+                            setReload(rel)
+                        }
+
+                        setIsLoading(false);
+                        showMessage({
+                            message: "El Producto fue eliminado exitosamente!",
+                            type: "success",
+                            icon: "success"
+                        });
+
+                    }, 3000);
+
+                }
+            },
+        ]);
+
+
+    }
+
+    const getProductosAprobados = async () => {
+
+       /*console.log('variables');
+        console.log(campaignActive.idcampaign);
+        console.log(producto_tranfer.idstock_campaign_producto);*/
+        const productos = await getProductosStockFetch(campaignActive.idcampaign, producto_tranfer.idstock_camion_campaign);
+       
+       
+        //setDataProducto(productos);
+        //setDataProductoDinamic(productos);
+   
+        return productos;
+    }
+
+    const getExistProductoStock = async (idstock_campaign_producto) => {
+
+        const res = await getStockCampaignProductoById(idstock_campaign_producto);
+        //console.log(res);
+        if (res != false)
+        {
+           
+            if(res.rows.length > 0){
+                return true;
+            }
+            
+        }
+        return false;
+
+    }
+
+    const updateProductoStockDB = async (producto_stock) => {
+
+        let data = {
+            idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
+            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            modified : producto_stock.stock_campaign_producto.modified,
+            cant_transfer: producto_stock.stock_campaign_producto.cant_transfer
+        }
+
+        let resul = await updateStockCampaignProductoToDB(data);
+        //console.log(resul);
+
+        return resul;
+
+    }
+
+    const insertProductoStockToDB = async (producto_stock) => {
+
+        let data = {
+            idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
+            productos_idproductos : producto_stock.stock_campaign_producto.productos_idproductos,
+            stock_camion_campaign_idstock_camion_campaign : producto_stock.stock_campaign_producto.stock_camion_campaign_idstock_camion_campaign,
+            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            cantidad_initial : producto_stock.stock_campaign_producto.cantidad_initial,
+            created : producto_stock.stock_campaign_producto.created,
+            modified : producto_stock.stock_campaign_producto.modified,
+            status : producto_stock.stock_campaign_producto.status,
+            cant_transfer: producto_stock.stock_campaign_producto.cant_transfer
+        }
+
+        let resul = await insertStockCampaignProductoToDB(data);
+
+        return resul;
+    }
+
+
+
     useEffect(() => {
 
         setProducto(producto_tranfer.producto);
@@ -108,6 +250,15 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
 
     return (
         <View style={styles.container}>
+
+
+
+            <View style={styles.label_container}>
+
+                <Text style={[styles.label_category, {
+                    backgroundColor: producto_tranfer.status == 0 ? COLORS.WARNING : COLORS.SUCCESS
+                }]}>{producto_tranfer.status == 0 ? 'Pendiente' : 'Aprobado'}</Text>
+            </View>
 
             <View style={styles.description_container}>
                 <Text style={styles.text_producto}>{'Origen: ' + producto_tranfer.camion_origen.nombre}</Text>
@@ -129,17 +280,30 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
                     + ')'}</Text>
             </View>
 
+            {hasButtons != false ?
 
-            <View style={styles.btn_stock}>
-                <ButtonView onPress={editTransferencia} text={'Editar'} type={TYPES_BTN.WARNING} icon_={'edit'}></ButtonView>
+                <View style={styles.btn_stock}>
+                    <ButtonView onPress={editTransferencia} text={'Editar'} type={TYPES_BTN.WARNING} icon_={'edit'}></ButtonView>
 
-            </View>
+                </View>
+                : null}
 
+            {hasButtons != false ?
+                <View style={styles.btn_stock}>
+                    <ButtonView onPress={acceptTransfer} text={'Aceptar'} type={TYPES_BTN.PRIMARY} icon_={'seleccionar'}></ButtonView>
 
-            <View style={styles.btn_stock}>
-                <ButtonView onPress={acceptTransfer} text={'Aceptar'} type={TYPES_BTN.PRIMARY} icon_={'seleccionar'}></ButtonView>
+                </View>
+                : null}
+            {producto_tranfer.status == 0 ? 
+            has_delete != false ?
+                <View style={styles.btn_stock}>
+                    <ButtonView onPress={deleteTransfer} text={'Eliminar'} type={TYPES_BTN.DANGER} icon_={'eliminar'}></ButtonView>
 
-            </View>
+                </View>
+                : null : <View style={styles.btn_stock}>
+                <ButtonView onPress={deleteTransfer} text={'Eliminar'} type={TYPES_BTN.DANGER} icon_={'eliminar'} disabled={true}></ButtonView>
+
+            </View> }
 
 
 
@@ -169,8 +333,9 @@ const styles = StyleSheet.create({
         shadowRadius: 1,
     },
     label_container: {
-
-        padding: 2
+        padding: 2,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
 
     },
     label_category: {
@@ -183,6 +348,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 5,
         color: '#ffffff',
     },
+
     image_container: {
         padding: 3,
         alignContent: 'center',

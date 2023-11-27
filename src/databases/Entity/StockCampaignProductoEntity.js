@@ -106,6 +106,59 @@ export async function updateStockCampaignProductoToDB(data)
 
 }
 
+export async function actualizarOnlyStockCampaignProductoToDB(data)
+{
+    const db = SQLITE.openDatabase(database_name);
+
+    const query = "UPDATE stock_campaign_producto SET cantidad = cantidad - (?) , modified = ? WHERE idstock_campaign_producto = ?;"
+    //console.log(data);
+
+
+    let promise = new Promise((resolve, reject) => {
+       
+        db.transaction(tx => {
+            tx.executeSql(query, [data.cantidad, data.modified, data.idstock_campaign_producto], 
+                (_, result) => {
+                   
+                  
+                    //console.log('update data campaign producto');
+                    // Resovle when the data is successful
+                    console.log('stock actualizado');
+            
+                    resolve(result);
+                }, (err, sqlerror) => {
+                   
+                    //console.log(sqlerror);
+                    //console.log(err);
+                    console.log('vsmpaign producto error');
+                   
+                    //reject();
+                    reject(err);
+                    //reject();
+                })
+        });
+    });
+
+    let result = await promise.then( (result) => { 
+        //setResult(true);
+        //console.log(result);
+        return result;
+    },
+    (error) => { 
+        //setResult(false);
+        //console.log(error);
+        return false;
+       
+    });
+    //db.closeAsync();
+
+    return result;
+
+
+
+}
+
+
 
 export async function getStockCampaignProductoById(idstock_campaign_producto)
 {

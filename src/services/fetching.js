@@ -651,5 +651,107 @@ export async function acceptTransferCamionFetch(idtransferencia_stock, idstock_c
     
 }
 
+export async function getProductosTransferenciasByCamionFetch(idcampaign, camion_origen)
+{
+    let headers = new Headers();
+
+
+    headers.append('Accept', 'application/json'); // This one is enough for GET requests
+    headers.append('Content-Type', 'application/json'); // This one sends body
+   // headers.append('X-CSRF-Token', csrf);
+
+    let data = {idcampaign : idcampaign, camion_origen : camion_origen}
+
+
+    const rawResponse = await fetch(URLS.GET_PRODUCTOS_TRANSFERENCIAS_BY_CAMION, { 
+        method: 'POST',
+        headers: headers, 
+        body: JSON.stringify(data)});
+    
+    try {
+        const content = await rawResponse.json(); 
+        //console.log(content);
+    
+        //user = content;
+        return content;
+    } catch(err) {
+       console.log(err);
+       return false;
+    }
+
+    return false;
+
+    
+}
+
+export async function deleteProductosTransferenciasByCamionFetch(idtransferencia_stock, idstock_campaign_producto)
+{
+    let headers = new Headers();
+
+
+    headers.append('Accept', 'application/json'); // This one is enough for GET requests
+    headers.append('Content-Type', 'application/json'); // This one sends body
+   // headers.append('X-CSRF-Token', csrf);
+
+    let data = {idtransferencia_stock : idtransferencia_stock, idstock_campaign_producto : idstock_campaign_producto}
+
+
+    const rawResponse = await fetch(URLS.DELETE_TRANSFERS_CAMION, { 
+        method: 'POST',
+        headers: headers, 
+        body: JSON.stringify(data)});
+    
+    try {
+        const content = await rawResponse.json(); 
+        //console.log(content);
+    
+        //user = content;
+        return content;
+    } catch(err) {
+       console.log(err);
+       return false;
+    }
+
+    return false;
+
+    
+}
+
+
+export async function addVentaFetch(data)
+{
+    let headers = new Headers();
+
+
+    headers.append('Accept', 'application/json'); // This one is enough for GET requests
+    headers.append('Content-Type', 'application/json'); // This one sends body
+   // headers.append('X-CSRF-Token', csrf);
+
+    //let data = {username : 'cris@hotmail.com', password: '1234567'}
+    //let data = {idusers :user_id}
+    //console.log(data);
+
+
+    const rawResponse = await fetch(URLS.ADD_VENTA, { 
+        method: 'POST',
+        headers: headers, 
+        body: JSON.stringify(data)});
+    
+    try {
+        const content = await rawResponse.json(); 
+        //console.log(content);
+    
+        //user = content;
+        return content;
+    } catch(err) {
+        console.log("eror");
+       console.log(err);
+       return false;
+    }
+
+    return false;
+
+    
+}
 
 

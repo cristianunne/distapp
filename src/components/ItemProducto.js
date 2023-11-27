@@ -38,26 +38,37 @@ const ItemProducto = ({ producto, setIsLoading }) => {
 
     const addToCart = async () => {
 
-        setIsLoading(true);
+        if(numberProductos > 0){
+            setIsLoading(true);
 
-        const res_save = await insertProductIntoCartSession(producto.idproductos, numberProductos, 
-            producto.precio, producto.descuento);
+            const res_save = await insertProductIntoCartSession(producto.idproductos, numberProductos, 
+                producto.precio, producto.descuento);
+    
+    
+            setTimeout(() => {
+                setIsLoading(false);
+                showMessage({
+                    message: "El Producto se agrego con éxito!",
+                    type: "success",
+                    icon: "success"
+                });
+    
+                /*Alert.alert('Información', 'El producto se agrego con exito', [
+          
+                    {
+                        text: 'Aceptar', onPress: async () => {
+                        }}]);*/
+            }, 3000)
 
-
-        setTimeout(() => {
-            setIsLoading(false);
+        } else {
             showMessage({
-                message: "El Producto se agrego con éxito!",
-                type: "success",
-                icon: "success"
+                message: "La Cantidad debe ser mayor a 0!",
+                type: "danger",
+                icon: "danger"
             });
+        }
 
-            /*Alert.alert('Información', 'El producto se agrego con exito', [
-      
-                {
-                    text: 'Aceptar', onPress: async () => {
-                    }}]);*/
-        }, 3000)
+       
 
     }
 
@@ -115,7 +126,7 @@ const ItemProducto = ({ producto, setIsLoading }) => {
             <View style={styles.counter_container}>
                     
                 <NumericInput type='plus-minus' onChange={value => setNumberProductos(value)} 
-                 totalWidth={100} 
+                 totalWidth={101} 
                  totalHeight={25}
                  maxValue={producto.cantidad} 
                  iconSize={25}

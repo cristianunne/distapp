@@ -63,7 +63,7 @@ const Splash = (component) => {
         //console.log("esta logueado en splah " + isLogin);
  
        
-    }, []);
+    }, [isLogin]);
 
 
     return (

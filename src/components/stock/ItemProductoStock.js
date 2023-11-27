@@ -62,6 +62,12 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
             }, 3000);
 
 
+        } else {
+            showMessage({
+                message: "La cantidad debe ser mayor a 0 (cero)",
+                type: "danger",
+                icon: "danger"
+            });
         }
 
 
@@ -96,9 +102,12 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
 
             }, 3000);
 
-
-
-
+        } else {
+            showMessage({
+                message: "La cantidad debe ser mayor a 0 (Cero)!",
+                type: "danger",
+                icon: "danger"
+            });
         }
 
     }
@@ -119,6 +128,10 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
                     let idstock_campaign_producto = producto.stock_campaign_producto.idstock_campaign_producto;
                     setIsLoading(true);
                     const resul = await deleteProductoSolicitudesStock(idstock_campaign_producto);
+
+
+                
+
 
                     setTimeout(() => {
 
@@ -198,7 +211,8 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
                 {funcion != null ? 
                 <NumericInput type='plus-minus' onChange={value => setNumberProductos(value)}
                     maxValue={disponible}
-                    totalWidth={100}
+                    minValue={0}
+                    totalWidth={102}
                     totalHeight={25}
                     iconSize={25}
                     rightButtonBackgroundColor='#BCBCBC'

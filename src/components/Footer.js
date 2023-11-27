@@ -1,10 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { AppContext } from '../Context/ContextApp';
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 const Footer = () => {
 
     const navigation = useNavigation();
+
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
 
 
 const goConfig = () => {
@@ -17,7 +21,21 @@ const goCompras = () => {
 }
 
 const goProductos = () => {
-    navigation.navigate('ProductosInicioScreen');
+    //navigation.navigate('ProductosInicioScreen');
+
+    if(campaignActive != null){
+        navigation.navigate('ProductosInicioScreen');
+    } else {
+        showMessage({
+            message: "No existen Campañas Activas!",
+            type: "danger",
+            icon: "danger"
+        });
+    }
+}
+
+const goToVentas = () => {
+    navigation.navigate('VentasInicioScreenOptions');
 }
 
 const goToHome = () => {
@@ -34,7 +52,7 @@ const goToHome = () => {
                     <Image source={require('../images/bag.png')} style={styles.bottomTabIcon} />
                     <Text style={styles.title}>Compras</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottonTab}>
+                <TouchableOpacity style={styles.bottonTab} onPress={goToVentas}>
                     <Image source={require('../images/ventas.png')} style={styles.bottomTabIcon} />
                     <Text style={styles.title}>Ventas</Text>
                 </TouchableOpacity>

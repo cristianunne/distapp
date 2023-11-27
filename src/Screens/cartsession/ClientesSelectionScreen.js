@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, ScrollView } from 'react-native'
+import { View, StyleSheet, ScrollView, Text } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import Header from '../../components/Header';
@@ -17,6 +17,8 @@ const ClientesSelectionScreen = ({ route }) => {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const [tableData,setTableData] = useState([]);
+    const [items, setItems] = useState();
+    const items_table = [];
 
     state = {
         tableHead: ['', 'Comercio', 'Apellido', 'Nombre', 'Localidad', 'Telefono'],
@@ -43,7 +45,7 @@ const ClientesSelectionScreen = ({ route }) => {
 
     }
 
-    const getClientes = async () => {
+    const getClientes_ = async () => {
         setIsLoading(true);
         const res_clientes = await getClientesDB();
         
@@ -80,47 +82,77 @@ const ClientesSelectionScreen = ({ route }) => {
        
     }
 
+    const getClientes = async () => {
+
+        //setIsLoading(true);
+        const res_clientes = await getClientesDB();
+
+        //console.log(res_clientes);
+
+        /*for(let j = 0; j < res_clientes.length; j++){
+            console.log(res_clientes.rows.items(j));
+        }*/
+        //console.log(res_clientes.rows.length);
+
+
+        for (let j = 0; j < res_clientes.rows.length; j++) {
+
+            let item = res_clientes.rows.item(j);
+
+            let sub_item = [];
+
+            sub_item.push(<View style={styles.row} key={j}>
+                <View style={styles.column_prod_icon}_>
+
+                <ButtonIcon type={TYPES_BTN.SUCCESS} icon={'check'} size_={18}
+                onPress={() => {
+                    selectCliente(res_clientes.rows.item(j));
+                }}></ButtonIcon>
+                </View>
+                <View style={styles.column_shop_name}><Text style={styles.text_row_head}>{item.shop_name}</Text></View>
+                <View style={styles.column_apellido}><Text style={styles.text_row_head}>{item.apellido}</Text></View>
+                <View style={styles.column_nombre}><Text style={styles.text_row_head}>{item.nombre}</Text></View>
+                <View style={styles.column_localidad}><Text style={styles.text_row_head}>{item.localidad}</Text></View></View>
+
+            );
+     
+            items_table.push(sub_item);
+
+        }
+
+        setItems(items_table);
+
+ 
+
+    }
+
 
 
 
     useEffect(() => {
        
        getClientes();
-;
     }, []);
 
     return (
         <View style={styles.container}>
-            <Header title={'Productos'} leftIcon={require('../../images/home.png')}
+            <Header title={'Seleccionar Cliente'} leftIcon={require('../../images/home.png')}
             />
              <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
-             <View style={styles.box_main}>
-                    <View style={styles.container_}>
-                        <ScrollView horizontal={true}>
-                            <View>
-                                <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-                                    <Row data={state.tableHead}
-                                        widthArr={state.widthArr} style={styles.header}
-                                        textStyle={styles.text} />
-                                </Table>
-                                <ScrollView style={styles.dataWrapper}>
-                                    <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-                                        {
-                                            tableData.map((rowData, index) => (
-                                                <Row
-                                                    key={index}
-                                                    data={rowData}
-                                                    widthArr={state.widthArr}
-                                                    style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' 
-                                                   }]}
-                                                    textStyle={styles.text_content}
-                                                />
-                                            ))
-                                        }
-                                    </Table>
-                                </ScrollView>
-                            </View>
+             <View style={styles.productos_container}>
+                    <View style={styles.productos_table_container}>
+                        <ScrollView>
+                        <View style={styles.table_head}>
+                        <View style={styles.column_head_icon}><Text style={styles.text_column_head}></Text></View>
+                            <View style={styles.column_head_prod}><Text style={styles.text_column_head}>Comercio</Text></View>
+                            <View style={styles.column_head_cantidad}><Text style={styles.text_column_head}>Apellido</Text></View>
+                            <View style={styles.column_head_precio}><Text style={styles.text_column_head}>Nombre</Text></View>
+                            <View style={styles.column_head_desc}><Text style={styles.text_column_head}>localidad</Text></View>
+                            
+                        </View>
+
+                        {items}
 
                         </ScrollView>
 
@@ -148,7 +180,7 @@ const styles = StyleSheet.create({
         color: '#187351'
     },
     box_main: {
-        flex: 0.92,
+        flex: 1,
         borderRadius: 10,
         padding: 0,
         flexDirection: 'row',
@@ -158,10 +190,156 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff'
 
     },
-    container_: { flex: 1, padding: 16, paddingTop: 30},
-    header: { height: 40, backgroundColor: '#cecece',color: '#000000'},
-    text: { textAlign: 'center', fontWeight: 'bold', color: '#000000' },
-    text_content: { textAlign: 'center', fontWeight: '400', color: '#000000' },
-    dataWrapper: { marginTop: -1 },
-    row: { height: 40, backgroundColor: '#fefefe'},
+
+    productos_container: {
+        flex: 1,
+        marginTop: 10,
+        padding: 5
+    },
+
+    productos_table_container: {
+        backgroundColor: '#ffffff',
+        flex: 1,
+        padding: 3
+
+    },
+    table_head: {
+        height: 32,
+        flexDirection: 'row',
+        alignContent: 'center',
+        justifyContent: 'space-around',
+        backgroundColor: '#dedede',
+    },
+
+    row: {
+        height: 32,
+        flexDirection: 'row',
+        alignContent: 'center',
+        justifyContent: 'space-around'
+    },
+    column_head: {
+        flex: 0.5,
+        borderColor: '#444444',
+        borderWidth: 0.5,
+        alignContent: 'center',
+        alignItems: 'center',
+
+    },
+    column_head_icon: {
+        borderColor: '#444444',
+        borderWidth: 0.3,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.1
+
+    },
+    column_head_cantidad: {
+
+        borderColor: '#444444',
+        borderWidth: 0.3,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.26
+    },
+    column_head_tot: {
+
+        borderColor: '#444444',
+        borderWidth: 0.3,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.23
+    },
+    column_head_prod: {
+
+        borderColor: '#444444',
+        borderWidth: 0.3,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.23
+    },
+    column_head_precio: {
+
+        borderColor: '#444444',
+        borderWidth: 0.3,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.21
+    },
+    column_head_desc: {
+
+        borderColor: '#444444',
+        borderWidth: 0.3,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.21
+    },
+    
+    /*  <View style={styles.column_prod_icon}_><Text style={styles.text_row_head}></Text></View>
+                <View style={styles.column_shop_name}><Text style={styles.text_row_head}>{item.shop_name}</Text></View>
+                <View style={styles.column_apellido}><Text style={styles.text_row_head}>{}</Text></View>
+                <View style={styles.column_nombre}><Text style={styles.text_row_head}>{}</Text></View>
+                <View style={styles.column_localidad}><Text style={styles.text_row_head}>{}</Text></View></View>*/
+
+
+
+    column_prod_icon: {
+
+        borderColor: '#444444',
+        borderWidth: 0.4,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.1
+    },
+
+    column_shop_name: {
+
+        borderColor: '#444444',
+        borderWidth: 0.4,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.23
+    },
+    column_apellido: {
+
+        borderColor: '#444444',
+        borderWidth: 0.4,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.26
+    },
+    column_nombre: {
+
+        borderColor: '#444444',
+        borderWidth: 0.4,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.21
+    },
+    column_localidad: {
+
+        borderColor: '#444444',
+        borderWidth: 0.4,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.21
+    },
+    text_column_head: {
+        fontSize: 10
+    },
+
+
+    text_row_head: {
+        fontSize: 9.5
+    }, 
 });

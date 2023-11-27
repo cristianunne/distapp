@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Header from '../../components/Header'
 import { useNavigation } from '@react-navigation/native'
-import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import ButtonAction from '../../components/ButtonAction';
 import { TYPES_BTN } from '../../styles/common_styles';
 import Footer from '../../components/Footer';
+import ButtonIcon from '../../components/ButtonIcon';
 
-const DescuentoGeneralScreen = ({ route }) => {
+const TypePagoSelectionScreen = ({ route }) => {
 
     const navigation = useNavigation();
     const productos = route.params.productos;
@@ -18,43 +19,41 @@ const DescuentoGeneralScreen = ({ route }) => {
     const subtotal = route.params.subtotal;
     const descuento_ = route.params.descuento;
     const total = route.params.total;
+    const descuento_general = route.params.descuento_general;
+    //console.log('aca va eldesc ' + descuento_general);
 
     const onChangeDescuento = (value) => {
 
         setDescuento(value);
     }
 
-    const onPressCancel = () => {
-        navigation.navigate('TypePagoSelectionScreen', {
+    const onPressCC = () => {
+        navigation.navigate('VentaFinalScreen', {
             productos: productos,
-            clientes : clientes,
-            descuento_general : descuento,
-            subtotal : subtotal,
-            descuento : descuento_,
-            total : total,
+            clientes: clientes,
+            descuento_general: descuento_general,
+            subtotal: subtotal,
+            descuento: descuento_,
+            total: total,
+            type_pago: 2
         });
     }
 
-    const onPressAcept = () => {
-        navigation.navigate('TypePagoSelectionScreen', {
+
+    const onPressEfectivo = () => {
+        navigation.navigate('VentaFinalScreen', {
             productos: productos,
-            clientes : clientes,
-            descuento_general : descuento,
-            subtotal : subtotal,
-            descuento : descuento_,
-            total : total,
+            clientes: clientes,
+            descuento_general: descuento_general,
+            subtotal: subtotal,
+            descuento: descuento_,
+            total: total,
+            type_pago: 1
         });
-        //console.log(descuento);
 
     }
-
-    useEffect(() => {
-
-    }, [descuento])
-
 
     return (
-
         <View style={styles.container}>
             <Header title={'Descuento General'} leftIcon={require('../../images/home.png')}
             />
@@ -64,36 +63,35 @@ const DescuentoGeneralScreen = ({ route }) => {
                     } color="white" />
                 </View>
                 <View style={styles.text_content}>
-                    <Text style={styles.text_info}>Puede aplicar un Descuento al total de la compra!</Text>
+                    <Text style={styles.text_info}>Seleccione el Tipo de pago</Text>
                 </View>
             </View>
 
 
             <View style={styles.box_content}>
-                    <View style={styles.box_input}>
-                        <Text style={styles.label}>Descuento: </Text>
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={onChangeDescuento}
-                            value={descuento}
-                            placeholder=""
-                            keyboardType="numeric"
-                        />
+              
 
-                    </View>
-                    <View style={styles.btn_container}>
-                        
-                        <ButtonAction title={'Cancelar'} type={TYPES_BTN.DANGER} onPress={onPressCancel}></ButtonAction>
-                        <ButtonAction title={'Aceptar'} type={TYPES_BTN.SUCCESS} onPress={onPressAcept}></ButtonAction>
+                <View style={styles.item_content}>
+                    <TouchableOpacity style={styles.item} onPress={onPressCC}>
+                        <Image source={require('../../images/tarjeta.png')} style={styles.iconItem} />
+                        <Text style={styles.text_icon}>Cuenta Corriente</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.item} onPress={onPressEfectivo}>
+                        <Image source={require('../../images/dinero.png')} style={styles.iconItem} />
+                        <Text style={styles.text_icon}>Efectivo</Text>
+                    </TouchableOpacity>
 
-                    </View>
-                </View>
+             
+
+             
+            </View>
+            </View>
             <Footer></Footer>
         </View>
     )
 }
 
-export default DescuentoGeneralScreen
+export default TypePagoSelectionScreen
 
 const styles = StyleSheet.create({
     container: {
@@ -118,6 +116,33 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         alignItems: 'center',
         justifyContent: 'center'
+    },
+
+    item_content: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        flex: 1,
+        paddingLeft: 7,
+        paddingRight: 7,
+    },
+
+    item: {
+
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'auto'
+    },
+
+    iconItem: {
+        width: 40,
+        height: 40,
+    },
+
+    text_icon: {
+        fontSize: 12,
+        maxWidth: 90,
+        alignSelf: 'center',
+        textAlign: 'center'
     },
     icon_info: {
         flex: 0.3,
@@ -152,7 +177,7 @@ const styles = StyleSheet.create({
 
     box_content: {
         flex: 0.2,
-       
+
         backgroundColor: '#ffffff',
         margin: 10,
         padding: 10
@@ -177,7 +202,7 @@ const styles = StyleSheet.create({
         gap: 100,
         alignItems: 'flex-end'
 
-    }, 
+    },
 
 
 });

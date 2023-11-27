@@ -13,6 +13,8 @@ import { getCampaignUser } from '../services/fetching';
 import { getUser, getUserCount } from '../databases/Entity/UsersEntity';
 import { getCampaignCount, getCampaignFromDB } from '../databases/Entity/CampaingEntity';
 import { useIsFocused } from '@react-navigation/native';
+import { getCamionesFromDB } from '../databases/Entity/CamionesEntity';
+import { getStockCamionCampaignFromDB } from '../databases/Entity/StockCamionCampaignEntity';
 
 
 //const Tab = createBottomTabNavigator();
@@ -23,7 +25,7 @@ function Home() {
 
     const [selectedTab, setSelectedTab] = useState(0)
 
-    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, idcamion, setIdcamion] = React.useContext(AppContext);
 
     const [name, setName] = useState();
 
@@ -89,10 +91,12 @@ function Home() {
 
                 if(data_campaign){
                     setCampaignActive(data_campaign.rows.item(0));
+                     //seteo tambien el id del camion
+                    setIdCamion_(data_campaign.rows.item(0).idcampaign);
 
                 }
 
-                console.log(data_campaign);
+               
 
             }
 
@@ -102,6 +106,18 @@ function Home() {
         }
 
     
+    }
+
+    const setIdCamion_ = async (idcampaign) => {
+        const myobj = JSON.parse(user);
+        const camion =  await getStockCamionCampaignFromDB(idcampaign, myobj.idusers);
+
+        if(camion != null){
+            setIdcamion(camion.rows.item(0).camion_idcamion);
+           
+        }
+      
+
     }
 
 
@@ -115,6 +131,7 @@ function Home() {
             setName(myobj.firstname + " " + myobj.lastname);
 
             getCampaign_Count();
+
         }
         
     }, [isFocused]);

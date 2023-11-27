@@ -10,85 +10,83 @@ import { AppContext } from '../../Context/ContextApp'
 import { getProductosTransferenciasCamionFetch } from '../../services/fetching'
 import ItemProductoAcceptTranfer from '../../components/camion/ItemProductoAcceptTranfer'
 import ItemProductoTransferAceptBox from '../../components/camion/ItemProductoTransferAceptBox'
+import { getProductosTransferenciasByCamionFetch } from '../../services/fetching';
 
-const CamionesTransferenciasAceptarScreen = ({route}) => {
+const CamionesTransferenciasVerScreen = ({route, navigation}) => {
+
+    const { idcamion, idcampaign } = route.params;
+
     const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
     const [dataProducto, setDataProducto] = useState();
     const [dataProductoDinamic, setDataProductoDinamic] = useState();
     const [busqueda, setBusqueda] = useState('');
 
-
-    const { idcamion, idcampaign } = route.params;
-
     const isFocused = useIsFocused();
     const [reload, setReload] = useState(false);
 
 
-
-    const getProductosTransferenciasCamionAPI = async () => {
-
+    //aca deberia hacer la traida de datos
+    const getProductosTransfer = async () => {
+        
+       
         setIsLoading(true);
       
-        const resul = await getProductosTransferenciasCamionFetch(idcampaign, idcamion);
+        const resul = await getProductosTransferenciasByCamionFetch(idcampaign, idcamion);
+
         setDataProducto(resul);
         setDataProductoDinamic(resul);
         setIsLoading(false);
-    
-
-        
     }
 
 
+
+
     useEffect(() => {
- 
+    
+        getProductosTransfer();
+
        
+    }, [isFocused, reload])
+  return (
+    <View style={styles.container}>
+    <Header title={'Productos de Transferencia'} leftIcon={require('../../images/home.png')}
+        rightIcon={require('../../images/cart.png')}
+    />
 
-        getProductosTransferenciasCamionAPI();
+    <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+    <View style={styles.search_box}>
 
-
-    }, [isFocused, reload]);
-
-
-    return (
-        <View style={styles.container}>
-            <Header title={'Productos de Transferencia'} leftIcon={require('../../images/home.png')}
-                rightIcon={require('../../images/cart.png')}
-            />
-
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
-            <View style={styles.search_box}>
-
-                <TextInput
-                    style={styles.input}
-                    onChangeText={null}
-                    value={busqueda}
-                    placeholder="Buscar"
-                />
+        <TextInput
+            style={styles.input}
+            onChangeText={null}
+            value={busqueda}
+            placeholder="Buscar"
+        />
 
 
-            </View>
-            <View style={styles.box_main}>
+    </View>
+    <View style={styles.box_main}>
 
-                <SafeAreaView style={styles.box_content}>
-                    <ScrollView style={styles.scrollview}>
+        <SafeAreaView style={styles.box_content}>
+            <ScrollView style={styles.scrollview}>
 
 
-                        <ItemProductoTransferAceptBox productos={dataProducto} setIsLoading={setIsLoading} reload ={reload} 
-                        setReload={setReload} has_delete={false}></ItemProductoTransferAceptBox>
+                <ItemProductoTransferAceptBox productos={dataProducto} setIsLoading={setIsLoading} reload ={reload} setReload={setReload}
+                hasButtons={false} has_delete={true}></ItemProductoTransferAceptBox>
 
-                    </ScrollView>
-                </SafeAreaView>
-            </View>
+            </ScrollView>
+        </SafeAreaView>
+    </View>
 
 
 
-            <Footer></Footer>
-        </View>
-    )
+    <Footer></Footer>
+</View>
+  )
 }
 
-export default CamionesTransferenciasAceptarScreen
+export default CamionesTransferenciasVerScreen
 
 const styles = StyleSheet.create({
     container: {

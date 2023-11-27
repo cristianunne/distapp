@@ -4,7 +4,7 @@ import { View, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, TYPES_BTN } from '../styles/common_styles';
 
-const ButtonView = ({onPress, text, icon_, type}) => {
+const ButtonView = ({onPress, text, icon_, type, disabled}) => {
 
     const [icon, setIcon] = useState(require('../images/ojo.png'));
 
@@ -34,9 +34,10 @@ const ButtonView = ({onPress, text, icon_, type}) => {
     <TouchableOpacity style={[styles.container, 
 
         type == TYPES_BTN.SUCCESS ? styles.success : type == TYPES_BTN.WARNING ? styles.warning : type == TYPES_BTN.PRIMARY ? styles.primary : 
-        type == TYPES_BTN.DANGER ? styles.danger : null
+        type == TYPES_BTN.DANGER ? styles.danger : null, 
+        disabled == true ? {opacity:0.6} : null
 
-    ]} onPress={onPress}>
+    ]} onPress={onPress} disabled={disabled}>
 
               <Image source={icon} style={styles.bottomTabIcon} />
               <Text style={styles.text}>{text}</Text>

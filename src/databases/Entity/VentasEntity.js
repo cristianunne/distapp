@@ -1,30 +1,35 @@
 import { database_name } from "../databaseServices";
 import * as SQLITE from 'expo-sqlite'
 
-export async function insertProductIntoCartSession(idproductos, cantidad, precio, descuento){
+
+export async function insertVentasToDB(data){
     
     const db = SQLITE.openDatabase(database_name);
 
-    const query = "INSERT INTO cart_session (productos_idproductos, cantidad,  precio, descuento)" + 
-    " VALUES (?, ?, ?, ?);";
+    const query = "INSERT INTO ventas (created, users_idusers, clientes_idclientes, subtotal, descuentos, total, descuento_general, pedidos_idpedidos, " + 
+    "coordenadas, campaign_idcampaign, cuenta_corriente, is_pay, camion_idcamion, status) " +
+    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     
 
     let promise = new Promise((resolve, reject) => {
        
         db.transaction(tx => {
-            tx.executeSql(query, [idproductos, cantidad, precio, descuento], 
+            tx.executeSql(query, [data.created, data.users_idusers, 
+                data.clientes_idclientes,  data.subtotal, data.descuentos, data.total, data.descuento_general, data.pedidos_idpedidos, 
+                data.coordenadas, 
+                data.campaign_idcampaign, data.cuenta_corriente, data.is_pay, data.camion_idcamion, data.status], 
                 (_, result) => {
+                   
                   
-                  
-                    console.log('insertado en CartSesion');
+                    console.log('inserted data Ventas');
                     // Resovle when the data is successful
             
                     resolve(result);
                 }, (err, sqlerror) => {
                    
                     console.log(sqlerror);
-                    //console.log(err);
-                    //console.log('mmmmmm');
+                    console.log(err);
+                    console.log('Ventas error');
                    
                     //reject();
                     reject(err);
@@ -36,7 +41,7 @@ export async function insertProductIntoCartSession(idproductos, cantidad, precio
     let result = await promise.then( (result) => { 
         //setResult(true);
         //console.log(result);
-        return true;
+        return result;
     },
     (error) => { 
         //setResult(false);
@@ -48,13 +53,14 @@ export async function insertProductIntoCartSession(idproductos, cantidad, precio
 
     return result;
    
+   
 }
 
-export async function getCartSessionCount()
+export async function getVentasFromDB()
 {
     const db = SQLITE.openDatabase(database_name);
 
-    const query = "SELECT COUNT(*) AS cantidad FROM cart_session";
+    const query = "SELECT * FROM ventas ORDER BY ventas_id ASC;";
 
     let promise = new Promise((resolve, reject) => {
         db.transaction(tx => {
@@ -78,7 +84,7 @@ export async function getCartSessionCount()
     },
     (error) => { 
         //setResult(false);
-        console.log('Error en la cntida de cartsession');
+        //console.log('Error en User ENtity CANTIDAD');
         return false;
     });
 
@@ -87,13 +93,49 @@ export async function getCartSessionCount()
 
 }
 
-export async function getCartSessionProductos()
+export async function getResumenVentasFromDB(is_pay)
 {
     const db = SQLITE.openDatabase(database_name);
 
-    const query = "SELECT *, cart_s.precio as cart_s_precio, cart_s.descuento as cart_s_descuento, " +  
-    "cart_s.cantidad as cart_s_cantidad FROM cart_session as cart_s INNER JOIN productos as pro ON cart_s.productos_idproductos =  pro.idproductos " +  
-    "INNER JOIN stock_campaign_producto as stcc ON cart_s.productos_idproductos = stcc.productos_idproductos";
+    const query = "SELECT SUM(subtotal) as subtotal, SUM(descuentos) AS descuentos, SUM(descuento_general) as descuento_general, "
+    + "SUM(total) AS total FROM ventas WHERE is_pay = ? ORDER BY ventas_id ASC;";
+
+    let promise = new Promise((resolve, reject) => {
+        db.transaction(tx => {
+            tx.executeSql(query, [is_pay], 
+                (_, result) => {
+                
+            
+                    resolve(result);
+                }, (err) => {
+                   
+                    reject(err);
+   
+                })
+        });
+    });
+
+    let result = await promise.then( (result) => { 
+        //setResult(true);
+        //console.log(result);
+        return result;
+    },
+    (error) => { 
+        //setResult(false);
+        //console.log('Error en User ENtity CANTIDAD');
+        return false;
+    });
+
+    //console.log(result);
+    return result;
+
+}
+
+export async function getResumenVentasAllFromDB()
+{
+    const db = SQLITE.openDatabase(database_name);
+
+    const query = "SELECT * FROM ventas INNER JOIN clientes ON ventas.clientes_idclientes = clientes.idclientes ORDER BY ventas_id ASC;";
 
     let promise = new Promise((resolve, reject) => {
         db.transaction(tx => {
@@ -117,7 +159,7 @@ export async function getCartSessionProductos()
     },
     (error) => { 
         //setResult(false);
-        console.log('Error en la cntida de cartsession');
+        //console.log('Error en User ENtity CANTIDAD');
         return false;
     });
 
@@ -126,22 +168,57 @@ export async function getCartSessionProductos()
 
 }
 
-export async function updateProductIntoCartSession(id_cart_session, cantidad, precio, descuento){
-    
+export async function getResumenVentasNotSentFromDB()
+{
     const db = SQLITE.openDatabase(database_name);
 
-    const query = "UPDATE cart_session SET cantidad = ?,  precio = ? , descuento = ? " + 
-    " WHERE id_cart_session = ?;";
-    
+    const query = "SELECT * FROM ventas WHERE status = 0 ORDER BY ventas_id ASC;";
+
+    let promise = new Promise((resolve, reject) => {
+        db.transaction(tx => {
+            tx.executeSql(query, [], 
+                (_, result) => {
+                
+            
+                    resolve(result);
+                }, (err) => {
+                   
+                    reject(err);
+   
+                })
+        });
+    });
+
+    let result = await promise.then( (result) => { 
+        //setResult(true);
+        //console.log(result);
+        return result;
+    },
+    (error) => { 
+        //setResult(false);
+        //console.log('Error en User ENtity CANTIDAD');
+        return false;
+    });
+
+    //console.log(result);
+    return result;
+
+}
+
+export async function updateVentaStatusDB(status, ventas_id, ventas_idventas){
+    const db = SQLITE.openDatabase(database_name);
+
+    const query = "UPDATE ventas SET status = ?, ventas_idventas = ? WHERE ventas_id = ?;"
+ 
 
     let promise = new Promise((resolve, reject) => {
        
         db.transaction(tx => {
-            tx.executeSql(query, [cantidad, precio, descuento, id_cart_session], 
+            tx.executeSql(query, [status, ventas_idventas, ventas_id], 
                 (_, result) => {
+                    //console.log('mmmmsdfsdfsdfsfsdfsdfsdmm');
                   
-                  
-                    console.log('update en CartSesion');
+                    console.log('update data productos');
                     // Resovle when the data is successful
             
                     resolve(result);
@@ -149,7 +226,7 @@ export async function updateProductIntoCartSession(id_cart_session, cantidad, pr
                    
                     console.log(sqlerror);
                     //console.log(err);
-                    //console.log('mmmmmm');
+                    console.log('error productos');
                    
                     //reject();
                     reject(err);
@@ -172,46 +249,5 @@ export async function updateProductIntoCartSession(id_cart_session, cantidad, pr
     //db.closeAsync();
 
     return result;
-   
-}
-
-
-export async function deleteProductoFromCartSessionDB(id_cart_session){
-
-    const db = SQLITE.openDatabase(database_name);
-
-    const query = "DELETE FROM cart_session WHERE id_cart_session = ?";
-
-    let promise = new Promise((resolve, reject) => {
-        db.transaction(tx => {
-            tx.executeSql(query, [id_cart_session], 
-                (_, result) => {
-                
-            
-                    resolve(result);
-                }, (err) => {
-                   
-                    reject(err);
-   
-                })
-        });
-    });
-
-    let result = await promise.then( (result) => { 
-        //setResult(true);
-        //console.log(result);
-        return result;
-    },
-    (error) => { 
-        //setResult(false);
-        console.log('Error en delete de cartsession');
-        return false;
-    });
-
-    //console.log(result);
-    return result;
-
 
 }
-
-

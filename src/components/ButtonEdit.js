@@ -20,7 +20,7 @@ export default ButtonEdit
 
 const styles = StyleSheet.create({
     container: {
-        flex: 0.8,
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         //backgroundColor: '#4BB543',
@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 3,
         borderBottomRightRadius: 3,
         borderBottomLeftRadius: 3,
-        width: 100,
         height: 26
     },
     bottomTabIcon: {

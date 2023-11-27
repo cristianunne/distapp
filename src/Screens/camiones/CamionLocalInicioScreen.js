@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import { AppContext } from '../../Context/ContextApp'
 import { useIsFocused } from '@react-navigation/native';
 import { getStockCamionCampaignFromDB } from '../../databases/Entity/StockCamionCampaignEntity'
+import { getProductosTransferenciasByCamionFetch } from '../../services/fetching'
 
 const CamionLocalInicioScreen = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -58,8 +59,20 @@ const CamionLocalInicioScreen = () => {
 
     }
 
-    const verTransferencias = () => {
+    const verTransferencias = async () => {
+
+        const productos = await getProductosTransferenciasByCamionFetch(campaignActive.idcampaign, idCamion);
+      
+
+        if (productos.length > 0){
+            navigation.navigate('CamionesTransferenciasVerScreen', {
+                idcampaign: campaignActive.idcampaign,
+                idcamion : idCamion
+            });
+        }
+
         
+
     }
 
 
@@ -93,7 +106,7 @@ const CamionLocalInicioScreen = () => {
 
                 <View style={styles.item_content}>
             
-                    <TouchableOpacity style={styles.item} onPress={acceptTransferencias}>
+                    <TouchableOpacity style={styles.item} onPress={verTransferencias}>
                         <Image source={require('../../images/ojo.png')} style={styles.iconItemGreen} />
                         <Text style={styles.text_icon}>Ver Transferencias</Text>
                     </TouchableOpacity>

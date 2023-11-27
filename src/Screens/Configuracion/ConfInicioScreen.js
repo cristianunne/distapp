@@ -13,7 +13,7 @@ import { LoadingModal } from "react-native-loading-modal";
 import { AppContext } from '../../Context/ContextApp'
 import { insertCompras, insertEmpleadoComprasstock } from '../../databases/Entity/ComprasEntity'
 import { createTables, database_name, deleteTables } from '../../databases/databaseServices'
-import { compras_table, delete_camiones_table, delete_campaign_table, delete_cart_session_table, delete_categories_table, delete_clientes_table, delete_compras_table, delete_productos_comprasstock_table, delete_productos_table, delete_proveedores_table, delete_stock_camion_campaign, delete_stock_campaign_producto, delete_subcategories_table, delete_ventas_table, productos_comprasstock_table } from '../../databases/querysTables'
+import { compras_table, delete_camiones_table, delete_campaign_table, delete_cart_session_table, delete_categories_table, delete_clientes_table, delete_compras_table, delete_productos_comprasstock_table, delete_productos_table, delete_proveedores_table, delete_stock_camion_campaign, delete_stock_campaign_producto, delete_subcategories_table, delete_users_table, delete_ventas_table, productos_comprasstock_table } from '../../databases/querysTables'
 import { useNavigation } from '@react-navigation/native'
 import { useIsFocused } from '@react-navigation/native';
 import { insertCampaignToDB } from '../../databases/Entity/CampaingEntity'
@@ -155,7 +155,7 @@ const ConfInicioScreen = () => {
 
             const exist_product = await getProductoById(item_.idproductos);
             //console.log('existe: ' + exist_product.rows.length);
-            console.log(item_);
+            //console.log(item_);
 
             if (exist_product != false) {
 
@@ -250,9 +250,9 @@ const ConfInicioScreen = () => {
                 //console.log(item_prod);
 
                 let status = 0;
-               
 
-                if(item_prod.status == 1){
+
+                if (item_prod.status == 1) {
                     status = 2;
                 }
 
@@ -289,6 +289,8 @@ const ConfInicioScreen = () => {
                     const del_campaign_table = await deleteTables(db, delete_campaign_table);
                     const del_stock_camion_campaign_table = await deleteTables(db, delete_stock_camion_campaign);
                     const del_stock_campaign_producto_table = await deleteTables(db, delete_stock_campaign_producto);
+                    const del_users = await deleteTables(db, delete_users_table);
+                    setIsLogin(false);
                     setCampaignActive(null);
 
                     setTimeout(() => {
@@ -322,8 +324,29 @@ const ConfInicioScreen = () => {
                     setIsLoading(true);
                     const myobj = JSON.parse(user);
                     const campaign_res = await getCampaignUserFetch(myobj.idusers);
+                    //elimino la campa;a
+                    const db = SQLITE.openDatabase(database_name);
+                
+                    const del_ventas_table = await deleteTables(db, delete_ventas_table);
+                    const del_compras_table = await deleteTables(db, delete_compras_table);
+                    const del_cartsession_table = await deleteTables(db, delete_cart_session_table);
+                    const del_productos_table = await deleteTables(db, delete_productos_table);
+                    const del_clientes_table = await deleteTables(db, delete_clientes_table);
+                    const del_proveedores_table = await deleteTables(db, delete_proveedores_table);
+                    const del_subcat_table = await deleteTables(db, delete_subcategories_table);
+                    const del_cat_table = await deleteTables(db, delete_categories_table);
+                    const del_camion_table = await deleteTables(db, delete_camiones_table);
+                    const del_campaign_table = await deleteTables(db, delete_campaign_table);
+                    const del_stock_camion_campaign_table = await deleteTables(db, delete_stock_camion_campaign);
+                    const del_stock_campaign_producto_table = await deleteTables(db, delete_stock_campaign_producto);
+                    setCampaignActive(null);
+                    /*console.log('resultado del borrado');
+                    console.log(del_res);*/
+
+
 
                     if (campaign_res) {
+
                         saveCampaignToDb(campaign_res);
                         //traigo los camiones
                         const camiones_res = await getCamionesFetch();
@@ -362,12 +385,40 @@ const ConfInicioScreen = () => {
                         //traigo tmb los clientes
                         getClientesAPIandSave();
 
-                    }
-                    //console.log(campaign_res);
-                    setTimeout(() => {
-                        setIsLoading(false);
+                        setTimeout(() => {
+                            setIsLoading(false);
+                            showMessage({
+                                message: "La Campaña se actualizó correctamente!",
+                                type: "success",
+                                icon: "success"
+                            });
+    
+                            navigation.navigate('Home');
 
-                    }, 3000)
+                        }, 3000)
+
+                       
+
+                    } else {
+
+                        //console.log(campaign_res);
+                        setTimeout(() => {
+                            setIsLoading(false);
+                            showMessage({
+                                message: "No existen Campañas Activas!",
+                                type: "danger",
+                                icon: "danger"
+                            });
+                            navigation.navigate('Home');
+
+                        }, 3000)
+
+                      
+
+
+                    }
+
+
 
                 }
             },
@@ -376,6 +427,7 @@ const ConfInicioScreen = () => {
     }
 
     const saveCampaignToDb = async (campaign) => {
+
 
         const res_save = insertCampaignToDB(campaign);
 
@@ -387,7 +439,20 @@ const ConfInicioScreen = () => {
     }
 
     const goToCamiones = () => {
-        navigation.navigate('CamionesInicioScreen');
+
+        //navigation.navigate('CamionesInicioScreen');
+        //verifico que la campaign este activa
+        if (campaignActive != null) {
+            navigation.navigate('CamionesInicioScreen');
+        } else {
+            showMessage({
+                message: "No existen Campañas Activas!",
+                type: "danger",
+                icon: "danger"
+            });
+        }
+
+
     }
 
     const goCompras = () => {
@@ -396,11 +461,30 @@ const ConfInicioScreen = () => {
 
 
     const goProductos = () => {
-        navigation.navigate('ProductosInicioScreen');
+
+        if (campaignActive != null) {
+            navigation.navigate('ProductosInicioScreen');
+        } else {
+            showMessage({
+                message: "No existen Campañas Activas!",
+                type: "danger",
+                icon: "danger"
+            });
+        }
     }
 
     const goLocalCamion = () => {
-        navigation.navigate('CamionLocalInicioScreen');
+
+        if (campaignActive != null) {
+            navigation.navigate('CamionLocalInicioScreen');
+        } else {
+            showMessage({
+                message: "No existen Campañas Activas!",
+                type: "danger",
+                icon: "danger"
+            });
+        }
+
     }
 
     useEffect(() => {
@@ -430,7 +514,7 @@ const ConfInicioScreen = () => {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.item} onPress={goLocalCamion}>
                         <Image source={require('../../images/truck.png')} style={styles.iconItem} />
-                        <Text style={styles.text_icon}>Camiones</Text>
+                        <Text style={styles.text_icon}>Transfer. Stock</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.item} onPress={goProductos}>
                         <Image source={require('../../images/productos.png')} style={styles.iconItem} />
@@ -572,7 +656,7 @@ const styles = StyleSheet.create({
     },
 
     text_icon: {
-        fontSize: 14,
+        fontSize: 11,
         maxWidth: 90,
         alignSelf: 'center',
         textAlign: 'center'

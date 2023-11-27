@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Splash from "./Screens/Splash";
 import Login from "./components/Login";
-import Home from "./Screens/Home";
+
 import { useNavigation } from '@react-navigation/native';
 import { AppContext, IsDbContext } from "./Context/ContextApp";
 import { DrawerHome } from "./Screens/DrawerHome";
@@ -29,6 +29,13 @@ import CamionesTranferenciaSentScreen from "./Screens/camiones/CamionesTranferen
 import CamionesSelectTranferScreen from "./Screens/camiones/CamionesSelectTranferScreen";
 import CamionesTransferenciasAceptarScreen from "./Screens/camiones/CamionesTransferenciasAceptarScreen";
 import CamionesEditProductoTransferScreen from "./Screens/camiones/CamionesEditProductoTransferScreen";
+import CamionesTransferenciasVerScreen from "./Screens/camiones/CamionesTransferenciasVerScreen";
+import TypePagoSelectionScreen from "./Screens/cartsession/TypePagoSelectionScreen";
+import VentasInicioScreen from "./Screens/ventas/VentasInicioScreen";
+import VentasInicioScreenOptions from "./Screens/ventas/VentasInicioScreenOptions";
+import VentasRealizadasScreen from "./Screens/ventas/VentasRealizadasScreen";
+import VentasResumenScreen from "./Screens/ventas/VentasResumenScreen";
+import VentasNotSentScreen from "./Screens/ventas/VentasNotSentScreen";
 
 
 
@@ -58,6 +65,7 @@ const AppNavigator = ({ dbExist }) => {
       <Stack.Navigator initialRouteName="Splash">
       <Stack.Screen options={{ headerShown: false }} name="Splash" component={Splash} />
       <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
+     
       <Stack.Screen options={{ headerShown: false }} name="InicioConfig" component={ConfInicioScreen} />
       <Stack.Screen options={{ headerShown: false }} name="InicioCompras" component={ComprasScreenInicio}/>
       <Stack.Screen options={{ headerShown: false }} name="ProductosComprasScreen" component={ProductosComprasScreen} />
@@ -68,6 +76,8 @@ const AppNavigator = ({ dbExist }) => {
       <Stack.Screen options={{ headerShown: false }} name="ProductoDetailsCartSessionScreen" component={ProductoDetailsCartSessionScreen} />
       <Stack.Screen options={{ headerShown: false }} name="ClientesSelectionScreen" component={ClientesSelectionScreen} />
       <Stack.Screen options={{ headerShown: false }} name="DescuentoGeneralScreen" component={DescuentoGeneralScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="TypePagoSelectionScreen" component={TypePagoSelectionScreen} />
+
       <Stack.Screen options={{ headerShown: false }} name="VentaFinalScreen" component={VentaFinalScreen} />
       <Stack.Screen options={{ headerShown: false }} name="CamionesInicioScreen" component={CamionesInicioScreen} />
       <Stack.Screen options={{ headerShown: false }} name="StockCargaInicioScreen" component={StockCargaInicioScreen} />
@@ -78,6 +88,13 @@ const AppNavigator = ({ dbExist }) => {
       <Stack.Screen options={{ headerShown: false }} name="CamionesSelectTranferScreen" component={CamionesSelectTranferScreen} />
       <Stack.Screen options={{ headerShown: false }} name="CamionesTransferenciasAceptarScreen" component={CamionesTransferenciasAceptarScreen} />
       <Stack.Screen options={{ headerShown: false }} name="CamionesEditProductoTransferScreen" component={CamionesEditProductoTransferScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="CamionesTransferenciasVerScreen" component={CamionesTransferenciasVerScreen} />
+
+      <Stack.Screen options={{ headerShown: false }} name="VentasInicioScreenOptions" component={VentasInicioScreenOptions} />
+      <Stack.Screen options={{ headerShown: false }} name="VentasInicioScreen" component={VentasInicioScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="VentasRealizadasScreen" component={VentasRealizadasScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="VentasResumenScreen" component={VentasResumenScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="VentasNotSentScreen" component={VentasNotSentScreen} />
 
       <Stack.Screen 
       options={{ headerShown: false }} 
