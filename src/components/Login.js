@@ -144,27 +144,30 @@ export default function Login() {
 
   const onPressButton = async () => {
 
-    showMessage({
-      message: "INicio de login!",
-      type: "success",
-      icon: "success"
-    });
-
-
+ 
     if (validate && validatePassword) {
 
       setIsLoading(true);
 
+      showMessage({
+        message: "Entro a login!",
+        type: "success",
+        icon: "success"
+      });
+
+      showMessage({
+        message: URLS.LOGIN_URL,
+        type: "success",
+        icon: "success"
+      });
+
       //tengo que traer los datos de los input text
       const res = await sessionAPI(email, password);
+
       if (!res) {
         setIsSesion(false);
         setIsLoading(false);
-        showMessage({
-          message: "NOOOn!",
-          type: "success",
-          icon: "success"
-        });
+      
    
       } else {
         showMessage({
