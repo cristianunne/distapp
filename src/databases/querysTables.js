@@ -91,6 +91,19 @@ export const productos_ventas_table = "CREATE TABLE IF NOT EXISTS productos_vent
 "cantidad INTEGER, precio_unidad REAL, descuento_unidad REAL, created TEXT, idstock_campaign_producto INTEGER, " +
 "FOREIGN KEY(ventas_idventas) REFERENCES ventas(ventas_id) ON DELETE CASCADE);"; 
 
+export const pedidos_table = "CREATE TABLE IF NOT EXISTS pedidos " +
+"(pedidos_id INTEGER PRIMARY KEY AUTOINCREMENT, idpedidos INTEGER UNIQUE, number INTEGER, created TEXT, users_idusers INTEGER NOT NULL, " +
+"clientes_idclientes INTEGER NOT NULL, " + 
+"observaciones TEXT, status_val INTEGER, " + 
+"FOREIGN KEY(users_idusers) REFERENCES users(idusers) ON DELETE CASCADE, " + 
+"FOREIGN KEY(clientes_idclientes) REFERENCES clientes(idclientes) ON DELETE SET NULL);";
+
+export const productos_pedidos_table = "CREATE TABLE IF NOT EXISTS productos_pedidos " + 
+"(pedidos_idproductos INTEGER PRIMARY KEY AUTOINCREMENT, idproductos_pedidos INTEGER NOT NULL, productos_idproductos INTEGER NOT NULL, " +
+"cantidad INTEGER, created TEXT, pedidos_idpedidos INTEGER, " +
+"FOREIGN KEY(idproductos_pedidos) REFERENCES pedidos(idproductos_pedidos) ON DELETE CASCADE, " +
+"FOREIGN KEY(pedidos_idpedidos) REFERENCES pedidos(idpedidos) ON DELETE CASCADE);"; 
+
 
 export const delete_campaign_table = "DELETE FROM campaign";
 export const delete_camiones_table = "DELETE FROM camiones";
@@ -107,6 +120,9 @@ export const delete_stock_campaign_producto = "DELETE FROM stock_campaign_produc
 export const delete_cart_session_table = "DELETE FROM cart_session";
 export const delete_ventas_table = "DELETE FROM ventas";
 export const delete_productos_ventas_table = "DELETE FROM productos_ventas";
+
+export const delete_pedidos_table = "DELETE FROM pedidos";
+export const delete_productos_pedidos_table = "DELETE FROM productos_pedidos";
 
 export const delete_users_table = "DELETE FROM users";
 

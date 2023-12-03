@@ -3,18 +3,27 @@ import { StyleSheet } from 'react-native';
 
 const LoginStyles = StyleSheet.create({
 
+
     container: {
         flex: 1,
-        padding: 24,
+        padding: 5,
+        backgroundColor: '#6ee7b7',
+        alignItems: 'center',
+    },
+
+    keyborard: {
+        flex: 1,
+        backgroundColor: '#ff0000',
+        padding: 5,
         backgroundColor: '#6ee7b7',
        
-        alignItems: 'center',
     },
 
     logo: {
         marginTop: 50,
         width: 150,
         height: 150,
+        alignSelf: 'center'
     },
 
     title: {

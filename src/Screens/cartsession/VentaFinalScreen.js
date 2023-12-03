@@ -16,13 +16,15 @@ import { deleteProductoFromCartSessionDB } from '../../databases/Entity/CartSess
 import { delete_cart_session_table } from '../../databases/querysTables';
 import * as SQLITE from 'expo-sqlite'
 import { LoadingModal } from "react-native-loading-modal";
+import { updatePedidoStatus } from '../../databases/Entity/PedidosEntity';
 
 
 
 
 export const VentaFinalScreen = ({ route }) => {
 
-    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, idcamion, setIdcamion] = React.useContext(AppContext);
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive,  idcamion, setIdcamion, 
+        clientePedido, setClientePedido, pedido, setPedido, isPedido, setIsPedido] = React.useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
 
     /**
@@ -123,7 +125,7 @@ export const VentaFinalScreen = ({ route }) => {
                             descuentos: descuento_,
                             total: total,
                             descuento_general: descuento_gen,
-                            pedidos_idpedidos: null,
+                            pedidos_idpedidos: isPedido ? pedido : null,
                             coordenadas: null,
                             campaign_idcampaign: campaignActive.idcampaign,
                             cuenta_corriente: type_pago == 2 ? 1 : 0,
@@ -164,12 +166,22 @@ export const VentaFinalScreen = ({ route }) => {
                                 //console.log(stock);
             
                                 let res_resta = await actualizarOnlyStockCampaignProductoToDB(stock);
+
+
+                                //actualizo el pedido a vendido
+                                let res_status_ped = await updatePedidoStatus(pedido);
+
             
                             }
             
                             //limpio el carrito
                             const db = SQLITE.openDatabase(database_name);
                             const clean_cart = await deleteTables(db, delete_cart_session_table);
+
+                            //limpio el context
+                            setClientePedido(null);
+                            setPedido(null);
+                            setIsPedido(false);
             
             
                             setTimeout(() => {
@@ -285,11 +297,6 @@ export const VentaFinalScreen = ({ route }) => {
                         </View>
 
                         {items}
-
-
-
-
-
 
 
                     </ScrollView>

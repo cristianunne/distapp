@@ -36,6 +36,9 @@ import VentasInicioScreenOptions from "./Screens/ventas/VentasInicioScreenOption
 import VentasRealizadasScreen from "./Screens/ventas/VentasRealizadasScreen";
 import VentasResumenScreen from "./Screens/ventas/VentasResumenScreen";
 import VentasNotSentScreen from "./Screens/ventas/VentasNotSentScreen";
+import PedidosScreen from "./Screens/pedidos/PedidosScreen";
+import PedidosInicioScreen from "./Screens/pedidos/PedidosInicioScreen";
+import PedidosResumenProductosScreen from "./Screens/pedidos/PedidosResumenProductosScreen";
 
 
 
@@ -95,6 +98,10 @@ const AppNavigator = ({ dbExist }) => {
       <Stack.Screen options={{ headerShown: false }} name="VentasRealizadasScreen" component={VentasRealizadasScreen} />
       <Stack.Screen options={{ headerShown: false }} name="VentasResumenScreen" component={VentasResumenScreen} />
       <Stack.Screen options={{ headerShown: false }} name="VentasNotSentScreen" component={VentasNotSentScreen} />
+
+      <Stack.Screen options={{ headerShown: false }} name="PedidosScreen" component={PedidosScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="PedidosInicioScreen" component={PedidosInicioScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="PedidosResumenProductosScreen" component={PedidosResumenProductosScreen} />
 
       <Stack.Screen 
       options={{ headerShown: false }} 

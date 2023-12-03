@@ -67,8 +67,10 @@ const VentasRealizadasItem = ({venta, sent, reload, setReload}) => {
             cuenta_corriente : venta.cuenta_corriente,
             is_pay: venta.is_pay,
             camion_idcamion : venta.camion_idcamion,
-            productos: productos
+            productos: productos,
+            pedidos_idpedidos: venta.pedidos_idpedidos,
         }
+
 
 
         Alert.alert('Envio', '¿Desea Enviar la Venta?', [
@@ -87,7 +89,7 @@ const VentasRealizadasItem = ({venta, sent, reload, setReload}) => {
                    
                     //setIsLoading(false);
        
-                    if(res != false){
+                    if(res != false && !isNaN(res)){
                         //cambio elestado de la venta
                         const result = await updateVentaStatusDB(1, venta.ventas_id, res);
 
@@ -120,16 +122,34 @@ const VentasRealizadasItem = ({venta, sent, reload, setReload}) => {
                         }
             
                     } else {
-                        setTimeout(() => {
 
-                            setIsLoading(false);
-                            showMessage({
-                                message: "Error. No se puede sincronizar la venta!",
-                                type: "danger",
-                                icon: "danger"
-                            });
-    
-                        }, 3000)
+                        if(res != false){
+                            setTimeout(() => {
+
+                                setIsLoading(false);
+                                const myJSON = JSON.stringify(res);
+                                showMessage({
+                                    message: myJSON,
+                                   
+                                    type: "danger",
+                                    icon: "danger"
+                                });
+        
+                            }, 3000)
+
+                        } else {
+                            setTimeout(() => {
+
+                                setIsLoading(false);
+                                showMessage({
+                                    message: "Error. No se puede sincronizar la venta!",
+                                    type: "danger",
+                                    icon: "danger"
+                                });
+        
+                            }, 3000)
+                        }
+                      
                     } 
                    
 

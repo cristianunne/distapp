@@ -23,6 +23,11 @@ const VentasInicioScreenOptions = () => {
         navigation.navigate('VentasNotSentScreen');
     }
 
+
+    const goToPedidosScreen = () => {
+        navigation.navigate('PedidosInicioScreen');
+    }
+
     return (
         <View style={styles.container}>
 
@@ -48,6 +53,21 @@ const VentasInicioScreenOptions = () => {
                         <Text style={styles.text_icon}>Ventas Sin Enviar</Text>
                     </TouchableOpacity>
 
+
+                </View>
+
+            </View>
+
+            <Text style={styles.text_title}>Pedidos</Text>
+            <View style={styles.box_main}>
+
+                <View style={styles.item_content}>
+                    <TouchableOpacity style={styles.item} onPress={goToPedidosScreen}>
+                        <Image source={require('../../images/pedido.png')} style={styles.iconItemGreen} />
+                        <Text style={styles.text_icon}>Ver Pedidos</Text>
+                    </TouchableOpacity>
+
+                   
 
                 </View>
 

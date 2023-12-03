@@ -10,9 +10,13 @@ import { getClientesDB } from '../../databases/Entity/ClientesEntity';
 import ButtonIcon from '../../components/ButtonIcon';
 import { TYPES_BTN } from '../../styles/common_styles';
 import Footer from '../../components/Footer';
+import { AppContext } from '../../Context/ContextApp';
 
 
 const ClientesSelectionScreen = ({ route }) => {
+    
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive,  idcamion, setIdcamion, 
+        clientePedido, setClientePedido, pedido, setPedido, isPedido, setIsPedido] = React.useContext(AppContext);
 
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +33,8 @@ const ClientesSelectionScreen = ({ route }) => {
     const subtotal = route.params.sutotal;
     const descuento = route.params.descuento;
     const total = route.params.total;
+    const idcliente = route.params.idcliente;
+
 
     const selectCliente = (cliente) => {
      
@@ -127,9 +133,35 @@ const ClientesSelectionScreen = ({ route }) => {
     }
 
 
+    const selectClienteById = async (idcliente) => {
+        const res_clientes = await getClientesDB();
+
+        for (let j = 0; j < res_clientes.rows.length; j++) {
+            let item = res_clientes.rows.item(j);
+
+            if(item.idclientes == idcliente){
+                selectCliente(item);
+                return;
+            }
+        }
+
+
+    }
+
+
 
 
     useEffect(() => {
+
+        if(isPedido){
+            if(clientePedido != undefined && clientePedido != null){
+                selectClienteById(clientePedido);
+     
+             }
+
+        }
+
+       
        
        getClientes();
     }, []);

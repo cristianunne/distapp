@@ -25,7 +25,7 @@ export async function insertUser(data){
                     resolve(result);
                 }, (err, sqlerror) => {
                     //console.log('sdsadsdjaosjdoasjdoasjda');
-                    console.log(err);
+                    console.log(sqlerror);
                    
                     //reject();
                     reject(sqlerror);

@@ -4,9 +4,10 @@ import { PreventRemoveProvider } from "@react-navigation/native";
 
 //const prefix_url = 'http://192.168.0.9/stockcontrolv3/API/';
 const prefix_url = 'http://192.168.0.154/stockcontrolv3/API/';
-//const prefix_url = 'http://192.168.1.12/stockcontrolv3/API/';
-//const prefix_url = 'iighicartografia.com/API/';
-const prefix_url_print = 'http://iighicartografia.com/';
+//const prefix_url = 'http://192.168.1.10/stockcontrolv3/API/';
+//const prefix_url = 'http://iighicartografia.com/API/';
+//const prefix_url_print = 'http://iighicartografia.com/';
+const prefix_url_print = 'http://192.168.0.154/stockcontrolv3/';
 
 //const prefix_url = 'http://192.168.0.77/stockcontrolv3/API/';
 
@@ -36,6 +37,8 @@ const URLS = {
     ACCEPT_TRANSFERS_CAMION: prefix_url + 'acceptTransfersCamion',
     DELETE_TRANSFERS_CAMION: prefix_url + 'deleteProductoTransferenciaCamion',
     ADD_VENTA : prefix_url + 'addVenta',
+
+    GET_PEDIDOS_BY_USER : prefix_url + 'getPedidosByUser'
     //getProductosTransferenciasCamion
 
   }

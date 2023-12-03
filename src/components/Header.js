@@ -36,7 +36,10 @@ const Header = ({ title, leftIcon, onClickLeftIcon }) => {
     }
 
     const onClickRightIcon = () => {
-        navigation.navigate('CartSessionInicioScreen');
+        navigation.navigate('CartSessionInicioScreen',  {
+            idpedido : null,
+            idcliente: null
+        });
     }
 
     useEffect(() => {

@@ -42,7 +42,8 @@ const VentasResumenScreen = ({ route }) => {
 
     const print_url = URLS.PRINT_URL + venta.ventas_idventas;
 
-    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, idcamion, setIdcamion] = React.useContext(AppContext);
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, clientePedido, setClientePedido, pedido, 
+        setPedido, isPedido, setIsPedido] = React.useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
     const [items, setItems] = useState();
     const items_table = [];

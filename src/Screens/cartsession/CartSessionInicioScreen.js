@@ -11,12 +11,21 @@ import ButtonAction from '../../components/ButtonAction'
 import { TYPES_BTN } from '../../styles/common_styles'
 import { useNavigation } from '@react-navigation/native'
 import { AppContext } from '../../Context/ContextApp'
+import { delete_cart_session_table } from '../../databases/querysTables';
+import * as SQLITE from 'expo-sqlite'
+import { database_name, deleteTables } from '../../databases/databaseServices';
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 
-const CartSessionInicioScreen = () => {
+const CartSessionInicioScreen = ({ route }) => {
 
-    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
-    
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive,  idcamion, setIdcamion, 
+        clientePedido, setClientePedido, pedido, setPedido, isPedido, setIsPedido] = React.useContext(AppContext);
+
+
+    const { idpedido, idcliente } = route.params;
+
+
 
     /**
      * Number.prototype.format(n, x, s, c)
@@ -26,12 +35,12 @@ const CartSessionInicioScreen = () => {
      * @param mixed   s: sections delimiter
      * @param mixed   c: decimal delimiter
      */
-        Number.prototype.format = function (n, x, s, c) {
-            var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',
-                num = this.toFixed(Math.max(0, ~~n));
-    
-            return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
-        };
+    Number.prototype.format = function (n, x, s, c) {
+        var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',
+            num = this.toFixed(Math.max(0, ~~n));
+
+        return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
+    };
 
     const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
@@ -48,13 +57,73 @@ const CartSessionInicioScreen = () => {
     const [reload, setReload] = useState(false);
 
     const goToSelectCliente = () => {
-        navigation.navigate('ClientesSelectionScreen', {
-            productos: prod,
-            sutotal: subTotal,
-            descuento: descuentos,
-            total: total
-        });
-        
+
+        if(prod.length == 0){
+
+            showMessage({
+                message: "Para realizar una Venta debe agregar Productos.",
+                type: "danger",
+                icon: "danger"
+            });
+
+        } else {
+            navigation.navigate('ClientesSelectionScreen', {
+                productos: prod,
+                sutotal: subTotal,
+                descuento: descuentos,
+                total: total,
+                idcliente: idcliente
+            });
+        }
+    }
+
+    const cleanCart = async () => {
+
+        Alert.alert('Vender', '¿Desea limpiar el Carrito?', [
+            {
+                text: 'Cancelar',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+            {
+                text: 'Aceptar', onPress: async () => {
+
+                    //limpio el carrito
+                    const db = SQLITE.openDatabase(database_name);
+                    const clean_cart = await deleteTables(db, delete_cart_session_table);
+
+
+
+                    if (clean_cart) {
+
+                        showMessage({
+                            message: "El Carrito se ha limpiado correctamente.",
+                            type: "success",
+                            icon: "success"
+                        });
+                        //limpio el context
+                        setClientePedido(null);
+                        setPedido(null);
+                        setIsPedido(false);
+                        setIsLoading(false);
+                        setReload(!reload);
+
+                    } else {
+
+                        setIsLoading(false);
+                        showMessage({
+                            message: "No se ha podido limpiar el Carrito. Intente nuevamente!.",
+                            type: "danger",
+                            icon: "danger"
+                        });
+
+                    }
+
+                }
+            },
+        ]);
+
+
     }
 
 
@@ -65,23 +134,23 @@ const CartSessionInicioScreen = () => {
 
         const productos = await getCartSessionProductos();
         //console.log(productos);
-        
+
         for (let i = 0; i < productos.rows.length; i++) {
             let producto = productos.rows.item(i);
             items_.push(producto);
 
-            result_.push(<ItemProductosCart key={i} producto={producto} setIsLoading={setIsLoading} reload={reload} setReload={setReload}/>);
+            result_.push(<ItemProductosCart key={i} producto={producto} setIsLoading={setIsLoading} reload={reload} setReload={setReload} />);
 
             subtotal_ = subtotal_ + (producto.cart_s_precio * producto.cart_s_cantidad);
             let des = producto.cart_s_descuento != null ? producto.cart_s_descuento : 0;
             descuentos_ = descuentos_ + (des * producto.cart_s_cantidad);
-           
+
         }
         setProd(items_);
 
         setSubTotal(subtotal_);
         setDescuentos(descuentos_);
-      
+
         setTotal(subtotal_ - descuentos_);
 
         //console.log(productos);
@@ -106,11 +175,11 @@ const CartSessionInicioScreen = () => {
     }
 
     useEffect(() => {
-        if(campaignActive != null){
+        if (campaignActive != null) {
             getProductos();
         }
-   
-     
+
+
     }, [isFocused, reload])
 
 
@@ -124,57 +193,61 @@ const CartSessionInicioScreen = () => {
 
             <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
 
-            {campaignActive == null ? messageError() : null } 
-          
-            {campaignActive == null ? null :   
-            <View style={styles.box_main}>
-                <SafeAreaView style={styles.box_content}>
-                    <ScrollView style={styles.scrollview}>
-                        <View style={styles.item_box}>
-                            {result}
+            {campaignActive == null ? messageError() : null}
+
+            {campaignActive == null ? null :
+                <View style={styles.box_main}>
+                    <SafeAreaView style={styles.box_content}>
+                        <ScrollView style={styles.scrollview}>
+                            <View style={styles.item_box}>
+                                {result}
+                            </View>
+                        </ScrollView>
+                    </SafeAreaView>
+                </View>}
+            {campaignActive == null ? null :
+                <View style={styles.box_resumen}>
+                    <View style={styles.box_sub_resumen_main}>
+                        <View style={styles.box_sub_resumen}>
+                            <Text style={styles.label}>Subtotal: </Text>
+                            <Text style={styles.prices_text_value}>
+                                $
+                                {subTotal != null ?
+                                    subTotal.format(2, 3, '.', ',') : 0}
+                            </Text>
                         </View>
-                    </ScrollView>
-                </SafeAreaView>
-            </View> }
-            {campaignActive == null ? null :   
-            <View style={styles.box_resumen}>
-                <View style={styles.box_sub_resumen_main}>
-                    <View style={styles.box_sub_resumen}> 
-                        <Text style={styles.label}>Subtotal: </Text>
-                        <Text style={styles.prices_text_value}>
-                        $
-                        {subTotal != null ?
-                            subTotal.format(2, 3, '.', ',') : 0}
-                        </Text>
+                        <View style={styles.box_sub_resumen}>
+                            <Text style={styles.label}>Descuentos: </Text>
+                            <Text style={styles.descuento_text_value}>
+                                $
+                                {descuentos != null ?
+                                    descuentos.format(2, 3, '.', ',') : 0}
+                            </Text>
+
+                        </View>
+                        <View style={styles.box_sub_resumen}>
+                            <Text style={styles.label_total}>Total: </Text>
+                            <Text style={styles.label_total}>
+                                $
+                                {total != null ?
+                                    total.format(2, 3, '.', ',') : 0}
+                            </Text>
+                        </View>
                     </View>
-                    <View style={styles.box_sub_resumen}>
-                        <Text style={styles.label}>Descuentos: </Text>
-                        <Text style={styles.descuento_text_value}>
-                        $
-                        {descuentos != null ?
-                            descuentos.format(2, 3, '.', ',') : 0}
-                        </Text>
+                    <View style={styles.box_sub_resumen_main}>
+                        <View style={styles.box_btn}>
+                            <View style={styles.box_sub_btn}>
+                                <ButtonAction title={'Vender'} type={TYPES_BTN.SUCCESS} onPress={goToSelectCliente}></ButtonAction>
+                            </View>
+
+                            <View style={styles.box_sub_btn}>
+                                <ButtonAction title={'Limpiar Carrito'} type={TYPES_BTN.DANGER} onPress={cleanCart}></ButtonAction>
+                            </View>
+
+                        </View>
 
                     </View>
-                    <View style={styles.box_sub_resumen}>
-                        <Text style={styles.label_total}>Total: </Text>
-                        <Text style={styles.label_total}> 
-                        $
-                        {total != null ?
-                            total.format(2, 3, '.', ',') : 0}
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.box_sub_resumen_main}>
-                    <View style={styles.box_btn}>
-                        <View style={styles.box_sub_btn}>
-                            <ButtonAction title={'Vender'} type={TYPES_BTN.SUCCESS} onPress={goToSelectCliente}></ButtonAction>
-                        </View>
-                        
-                    </View>
-                    
-                </View>
-            </View> }
+                </View>}
 
             <FlashMessage position="bottom" />
 
@@ -261,7 +334,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontSize: 24,
         fontWeight: 'bold',
-        color:'#555555'
+        color: '#555555'
 
     },
     prices_text_value: {
@@ -280,12 +353,12 @@ const styles = StyleSheet.create({
         alignContent: 'flex-end',
         alignItems: 'flex-end',
         flexDirection: 'column-reverse',
-        
+
     },
     box_sub_btn: {
-      flex: 0.5,
-      alignItems: 'center',
-      alignContent: 'center',
-      flexDirection: 'column-reverse'
+        flex: 0.5,
+        alignItems: 'center',
+        alignContent: 'center',
+        flexDirection: 'column-reverse'
     }
 });

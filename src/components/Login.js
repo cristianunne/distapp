@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState, useContext } from 'react'
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, KeyboardAvoidingView, ScrollView, SafeAreaView } from 'react-native';
 import LoginStyles from '../styles/Login.styled';
 import CustomTextInput from './CustomTextInput';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,8 @@ import { getUser, getUserCount, insertUser } from '../databases/Entity/UsersEnti
 import { LoadingModal } from "react-native-loading-modal";
 
 import { showMessage, hideMessage } from "react-native-flash-message";
+
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 export default function Login() {
@@ -76,11 +78,11 @@ export default function Login() {
       } else {
         //traigo el usuario y agrego al context sus datos
         //console.log(user_count.rows.item(0).cantidad)
-      
+
         const user_data = await getUser();
 
 
-        
+
 
         setDataToContext(user_data)
 
@@ -90,7 +92,7 @@ export default function Login() {
         }, 3000);
 
 
-        
+
       }
     }
   }
@@ -103,10 +105,10 @@ export default function Login() {
     let data_ = JSON.stringify(user_data.rows.item(0));
     setUser(data_);
     //console.log(user);
-    
+
     //setUser(...user, JSON.stringify(user_data.rows.item(0)));
-   
-}
+
+  }
 
 
 
@@ -144,49 +146,43 @@ export default function Login() {
 
   const onPressButton = async () => {
 
- 
+    //const res = await sessionAPI(email, password);
+    //console.log(res);
+
     if (validate && validatePassword) {
 
       setIsLoading(true);
 
-      showMessage({
-        message: "Entro a login!",
-        type: "success",
-        icon: "success"
-      });
-
-      showMessage({
-        message: URLS.LOGIN_URL,
-        type: "success",
-        icon: "success"
-      });
 
       //tengo que traer los datos de los input text
       const res = await sessionAPI(email, password);
 
+
       if (!res) {
         setIsSesion(false);
         setIsLoading(false);
-      
-   
-      } else {
+
         showMessage({
-          message: "SIIII!",
-          type: "success",
-          icon: "success"
+          message: res.toString(),
+          type: "danger",
+          icon: "danger"
         });
+
+
+      } else {
+
         setIsSesion(true);
         //mando a guardar el usuario creado
         //console.log(res);
         saveDataUser(res);
-        setIsLoading(false);
+
 
       }
     } else {
       showMessage({
-        message: "dssgsdgsdgsdgsdgsdgsdg!",
-        type: "success",
-        icon: "success"
+        message: "Error!",
+        type: "danger",
+        icon: "danger"
       });
     }
   }
@@ -198,7 +194,7 @@ export default function Login() {
 
     const res = await insertUser(data);
     if (res) {
-    
+
       const re = await getUserFromDb()
       setIsLogin(true);
 
@@ -209,41 +205,88 @@ export default function Login() {
 
   return (
 
-    <View style={LoginStyles.container}>
-        <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando...'}/>
-      <Image source={require('../images/login.png')} style={LoginStyles.logo}>
-      </Image>
-      <Text style={LoginStyles.title}>
-        Iniciar Sesión
-      </Text>
+    <KeyboardAwareScrollView style={LoginStyles.keyborard}>
+      
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando...'} />
+            <Image source={require('../images/login.png')} style={LoginStyles.logo}>
+            </Image>
+            <Text style={LoginStyles.title}>
+              Iniciar Sesión
+            </Text>
 
-      <CustomTextInput placeholder={'Ingrese su Email'}
-        icon={require('../images/correo.png')}
-        value={email}
-        validate={validate}
-        onChangeText={(text) => {
-          setEmail(text);
-        }}
+            <CustomTextInput placeholder={'Ingrese su Email'}
+              icon={require('../images/correo.png')}
+              value={email}
+              validate={validate}
+              onChangeText={(text) => {
+                setEmail(text);
+              }}
 
-      />
-      <CustomTextInput placeholder={'Ingrese su Contraseña'}
-        type={'password'}
-        validate={validatePassword}
-        icon={require('../images/candado.png')}
-        onChangeText={(text) => {
-          setPassword(text);
-          setInicio(false);
-        }}
-      />
+            />
+            <CustomTextInput placeholder={'Ingrese su Contraseña'}
+              type={'password'}
+              validate={validatePassword}
+              icon={require('../images/candado.png')}
+              onChangeText={(text) => {
+                setPassword(text);
+                setInicio(false);
+              }}
+            />
 
-      <CustomButton title={'Aceptar'} onPress={onPressButton} />
+            <CustomButton title={'Aceptar'} onPress={onPressButton} />
 
 
-      <Text style={!isSesion ? LoginStyles.error : LoginStyles.dnone}>
-        Credenciales invalidas
-      </Text>
+            <Text style={!isSesion ? LoginStyles.error : LoginStyles.dnone}>
+              Credenciales invalidas
+            </Text>
+           
+         
 
-    </View>
+    </KeyboardAwareScrollView>
+
+    /*<SafeAreaView style={LoginStyles.safearea}>
+ 
+      <ScrollView style={LoginStyles.scrollview}>
+
+      
+          <View style={LoginStyles.subcontainer}>
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando...'} />
+            <Image source={require('../images/login.png')} style={LoginStyles.logo}>
+            </Image>
+            <Text style={LoginStyles.title}>
+              Iniciar Sesión
+            </Text>
+
+            <CustomTextInput placeholder={'Ingrese su Email'}
+              icon={require('../images/correo.png')}
+              value={email}
+              validate={validate}
+              onChangeText={(text) => {
+                setEmail(text);
+              }}
+
+            />
+            <CustomTextInput placeholder={'Ingrese su Contraseña'}
+              type={'password'}
+              validate={validatePassword}
+              icon={require('../images/candado.png')}
+              onChangeText={(text) => {
+                setPassword(text);
+                setInicio(false);
+              }}
+            />
+
+            <CustomButton title={'Aceptar'} onPress={onPressButton} />
+
+
+            <Text style={!isSesion ? LoginStyles.error : LoginStyles.dnone}>
+              Credenciales invalidas
+            </Text>
+           
+          </View>
+     
+      </ScrollView>
+      </SafeAreaView>*/
 
   )
 }

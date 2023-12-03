@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Image, Text, Alert } from 'react-na
 import * as SQLITE from 'expo-sqlite'
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
-import { getCamionesFetch, getCampaignUserFetch, getCategories, getClientes, getSubcategories } from '../../services/fetching'
+import { getCamionesFetch, getCampaignUserFetch, getCategories, getClientes, getPedidosByUserFetch, getSubcategories } from '../../services/fetching'
 import { insertCategories } from '../../databases/Entity/CategoriesEntity'
 import { insertSubcategories } from '../../databases/Entity/SubcategoriesEntity'
 import { getComprasAPI, getProductosAPI, getProveedoresAPI } from '../../databases/querys'
@@ -13,7 +13,7 @@ import { LoadingModal } from "react-native-loading-modal";
 import { AppContext } from '../../Context/ContextApp'
 import { insertCompras, insertEmpleadoComprasstock } from '../../databases/Entity/ComprasEntity'
 import { createTables, database_name, deleteTables } from '../../databases/databaseServices'
-import { compras_table, delete_camiones_table, delete_campaign_table, delete_cart_session_table, delete_categories_table, delete_clientes_table, delete_compras_table, delete_productos_comprasstock_table, delete_productos_table, delete_proveedores_table, delete_stock_camion_campaign, delete_stock_campaign_producto, delete_subcategories_table, delete_users_table, delete_ventas_table, productos_comprasstock_table } from '../../databases/querysTables'
+import { compras_table, delete_camiones_table, delete_campaign_table, delete_cart_session_table, delete_categories_table, delete_clientes_table, delete_compras_table, delete_pedidos_table, delete_productos_comprasstock_table, delete_productos_pedidos_table, delete_productos_table, delete_proveedores_table, delete_stock_camion_campaign, delete_stock_campaign_producto, delete_subcategories_table, delete_users_table, delete_ventas_table, productos_comprasstock_table } from '../../databases/querysTables'
 import { useNavigation } from '@react-navigation/native'
 import { useIsFocused } from '@react-navigation/native';
 import { insertCampaignToDB } from '../../databases/Entity/CampaingEntity'
@@ -22,6 +22,7 @@ import { insertStockCamionCampignToDB } from '../../databases/Entity/StockCamion
 import { insertClientes } from '../../databases/Entity/ClientesEntity'
 
 import { showMessage, hideMessage } from "react-native-flash-message";
+import { insertPedidos, insertProductosPedidos } from '../../databases/Entity/PedidosEntity'
 
 const ConfInicioScreen = () => {
 
@@ -487,6 +488,90 @@ const ConfInicioScreen = () => {
 
     }
 
+    const syncPedidos = async () => {
+
+        Alert.alert('Sincronión', '¿Desea Sincronizar Pedidos?', [
+            {
+                text: 'Cancelar',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+            {
+                text: 'Aceptar', onPress: async () => {
+
+                    setIsLoading(true);
+                    const db = SQLITE.openDatabase(database_name);
+                    //aca puedo eliminar las tablas primero
+                    const del_pedido = await deleteTables(db, delete_pedidos_table);
+                    const del_prod_ped = await deleteTables(db, delete_productos_pedidos_table);
+
+                    const myobj = JSON.parse(user);
+
+                    const pedidos = await getPedidosByUserFetch(myobj.idusers);
+            
+                    //almaceno los datos en la db local
+            
+                    for (pedido of pedidos)
+                    {
+                        let data_pedido = {
+                            idpedidos : pedido.idpedidos,
+                            number : pedido.number,
+                            created : pedido.created,
+                            users_idusers : pedido.users_idusers,
+                            clientes_idclientes : pedido.clientes_idclientes,
+                            observaciones : pedido.observaciones,
+                            status_val : pedido.status_val,
+                          
+                        };
+                        console.log(pedido);
+                        
+                        const res_pedidos = await insertPedidos(data_pedido);
+            
+                        if(res_pedidos){
+                            //almacenoslos productos
+            
+                            for(prod of pedido.productos)
+                            {
+            
+                                let prod_pedidos = {
+                                    idproductos_pedidos : prod._joinData.idproductos_pedidos,
+                                    productos_idproductos : prod._joinData.productos_idproductos,
+                                    cantidad : prod._joinData.cantidad,
+                                    pedidos_idpedidos : prod._joinData.pedidos_idpedidos,
+                                }
+            
+                                const res_prod_ped = await insertProductosPedidos(prod_pedidos);
+            
+                            }
+            
+                        }
+            
+                    }
+            
+                
+                    setTimeout(() => {
+
+                        setIsLoading(false);
+                        showMessage({
+                            message: "Los Pedidos se han actualizado con éxito!",
+                            type: "success",
+                            icon: "success"
+                        });
+
+                    }, 3000)
+
+
+                }
+            },
+        ]);
+
+     
+
+
+       
+
+    }
+
     useEffect(() => {
 
         /*if (categoriesData != null) {
@@ -502,7 +587,7 @@ const ConfInicioScreen = () => {
         <View style={styles.container}>
 
             <Header title={'Configuraciones'} leftIcon={require('../../images/home.png')} />
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
             <Text style={styles.text_title}>Ver (Datos Almacenados en el Móvil)</Text>
             <View style={styles.box_main}>
@@ -528,8 +613,8 @@ const ConfInicioScreen = () => {
                         <Text style={styles.text_icon}>Clientes</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.item}>
-                        <Image source={require('../../images/proveedores.png')} style={styles.iconItem} />
-                        <Text style={styles.text_icon}>Proveedores</Text>
+                        <Image source={require('../../images/pedido.png')} style={styles.iconItem} />
+                        <Text style={styles.text_icon}>Pedidos</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.item} onPress={goCompras}>
@@ -578,9 +663,9 @@ const ConfInicioScreen = () => {
                         <Image source={require('../../images/clientes.png')} style={styles.iconItem} />
                         <Text style={styles.text_icon}>Clientes</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.item}>
-                        <Image source={require('../../images/proveedores.png')} style={styles.iconItem} />
-                        <Text style={styles.text_icon}>Proveedores</Text>
+                    <TouchableOpacity style={styles.item} onPress={syncPedidos}>
+                        <Image source={require('../../images/pedido.png')} style={styles.iconItem} />
+                        <Text style={styles.text_icon}>Pedidos</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.item} onPress={syncCompras}>

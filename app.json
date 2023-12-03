@@ -3,6 +3,7 @@
     "name": "distapp",
     "slug": "distapp",
     "version": "1.0.0",
+    "icon": "truck.png",
     "assetBundlePatterns": [
       "**/*"
     ],

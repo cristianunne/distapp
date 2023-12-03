@@ -14,6 +14,10 @@ const MyProvider = (props) => {
     const [campaignActive, setCampaignActive] = useState(null);
     const [idcamion, setIdcamion] = useState(null);
 
+    const [clientePedido, setClientePedido] = useState(null);
+    const [pedido, setPedido] = useState(null);
+    const [isPedido, setIsPedido] = useState(false);
+
 
     useState(() => {
         //console.log("esta logueado context " + isLogin);
@@ -22,7 +26,8 @@ const MyProvider = (props) => {
 
     return(
 
-        <AppContext.Provider value={[isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, idcamion, setIdcamion]}>
+        <AppContext.Provider value={[isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, idcamion, setIdcamion, 
+        clientePedido, setClientePedido, pedido, setPedido, isPedido, setIsPedido]}>
             <IsDbContext.Provider value={[isDb, setIsDb]}>
                 {props.children}
             </IsDbContext.Provider>
