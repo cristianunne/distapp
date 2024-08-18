@@ -18,6 +18,8 @@ const DescuentoGeneralScreen = ({ route }) => {
     const subtotal = route.params.subtotal;
     const descuento_ = route.params.descuento;
     const total = route.params.total;
+    const fecha_venta = route.params.fecha_venta;
+
 
     const onChangeDescuento = (value) => {
 
@@ -32,6 +34,7 @@ const DescuentoGeneralScreen = ({ route }) => {
             subtotal : subtotal,
             descuento : descuento_,
             total : total,
+            fecha_venta: fecha_venta
         });
     }
 
@@ -43,12 +46,15 @@ const DescuentoGeneralScreen = ({ route }) => {
             subtotal : subtotal,
             descuento : descuento_,
             total : total,
+            fecha_venta: fecha_venta
         });
         //console.log(descuento);
 
     }
 
     useEffect(() => {
+        console.log('descuento');
+         console.log(fecha_venta);
 
     }, [descuento])
 

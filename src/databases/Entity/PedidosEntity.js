@@ -106,7 +106,7 @@ export async function getPedidosFromDB()
 {
     const db = SQLITE.openDatabase(database_name);
 
-    const query = "SELECT * FROM pedidos as p INNER JOIN clientes as cl ON p.clientes_idclientes = cl.idclientes;";
+    const query = "SELECT * FROM pedidos as p INNER JOIN clientes as cl ON p.clientes_idclientes = cl.idclientes ORDER BY cl.localidad, cl.nombre ASC;";
 
     let promise = new Promise((resolve, reject) => {
         db.transaction(tx => {

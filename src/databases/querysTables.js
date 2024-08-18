@@ -16,8 +16,8 @@ export const stock_camion_campaign_table = "CREATE TABLE IF NOT EXISTS stock_cam
   "FOREIGN KEY(users_idusers) REFERENCES users(idusers));";
 
   export const stock_camion_campaign_producto_table = "CREATE TABLE IF NOT EXISTS stock_campaign_producto " +
-  "(idstock_campaign_producto_id INTEGER PRIMARY KEY AUTOINCREMENT, idstock_campaign_producto INTEGER UNIQUE, productos_idproductos INTEGER, cantidad INTEGER, " +
-  "created TEXT, modified TEXT, cantidad_initial INTEGER, status INTEGER, stock_camion_campaign_idstock_camion_campaign	INTEGER, cant_transfer INTEGER, " +
+  "(idstock_campaign_producto_id INTEGER PRIMARY KEY AUTOINCREMENT, idstock_campaign_producto INTEGER UNIQUE, productos_idproductos INTEGER, cantidad REAL, " +
+  "created TEXT, modified TEXT, cantidad_initial REAL, status INTEGER, stock_camion_campaign_idstock_camion_campaign	INTEGER, cant_transfer REAL, " +
   "FOREIGN KEY(stock_camion_campaign_idstock_camion_campaign) REFERENCES stock_camion_campaign(idstock_camion_campaign), " + 
   "FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos));";
 
@@ -64,14 +64,14 @@ export const compras_table = "CREATE TABLE IF NOT EXISTS compras_stock " +
 
 export const productos_comprasstock_table = "CREATE TABLE IF NOT EXISTS empleado_comprasstock " +
 "(empleado_comprastock_id INTEGER PRIMARY KEY AUTOINCREMENT, idempleado_comprastock INTEGER UNIQUE, " +
-"productos_idproductos INTEGER, comprasstock_idcomprasstock INTEGER, cantidad INTEGER, " + 
-"comprobante VARCHAR(150), status INTEGER DEFAULT 0, observaciones VARCHAR(250), cantidad_comprada INTEGER DEFAULT 0, " + 
+"productos_idproductos INTEGER, comprasstock_idcomprasstock INTEGER, cantidad REAL, " + 
+"comprobante VARCHAR(150), status INTEGER DEFAULT 0, observaciones VARCHAR(250), cantidad_comprada REAL DEFAULT 0, " + 
 "FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos) ON DELETE CASCADE, " + 
 "FOREIGN KEY(comprasstock_idcomprasstock) REFERENCES compras_stock(idcompras_stock) ON DELETE CASCADE);";
 
 
 export const cart_session_table = "CREATE TABLE IF NOT EXISTS cart_session " +
-"(id_cart_session INTEGER PRIMARY KEY AUTOINCREMENT, productos_idproductos INTEGER, cantidad INTEGER, " +
+"(id_cart_session INTEGER PRIMARY KEY AUTOINCREMENT, productos_idproductos INTEGER, cantidad REAL, " +
 "precio REAL, descuento REAL, " +
 "FOREIGN KEY(productos_idproductos) REFERENCES productos(idproductos) ON DELETE CASCADE);";
 
@@ -80,7 +80,7 @@ export const ventas_table = "CREATE TABLE IF NOT EXISTS ventas " +
 "(ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, ventas_idventas INTEGER UNIQUE, created TEXT, users_idusers INTEGER NOT NULL, " +
 "clientes_idclientes INTEGER NOT NULL, subtotal REAL NOT NULL, descuentos REAL, total REAL NOT NULL, descuento_general REAL, " + 
 "pedidos_idpedidos INTEGER, coordenadas TEXT, campaign_idcampaign INTEGER NOT NULL, cuenta_corriente INTEGER NOT NULL, " +
-"is_pay INTEGER NOT NULL, camion_idcamion INTEGER NOT NULL, status INTEGER, " + 
+"is_pay INTEGER NOT NULL, camion_idcamion INTEGER NOT NULL, status INTEGER, fecha_venta TEXT, " + 
 "FOREIGN KEY(users_idusers) REFERENCES users(idusers) ON DELETE CASCADE, " + 
 "FOREIGN KEY(clientes_idclientes) REFERENCES clientes(idclientes) ON DELETE SET NULL, " + 
 "FOREIGN KEY(campaign_idcampaign) REFERENCES campaign(idcampaign) ON DELETE CASCADE, " + 
@@ -88,7 +88,7 @@ export const ventas_table = "CREATE TABLE IF NOT EXISTS ventas " +
 
 export const productos_ventas_table = "CREATE TABLE IF NOT EXISTS productos_ventas " + 
 "(productos_ventas_id INTEGER PRIMARY KEY AUTOINCREMENT, ventas_idventas INTEGER NOT NULL, productos_idproductos INTEGER NOT NULL, " +
-"cantidad INTEGER, precio_unidad REAL, descuento_unidad REAL, created TEXT, idstock_campaign_producto INTEGER, " +
+"cantidad REAL, precio_unidad REAL, descuento_unidad REAL, created TEXT, idstock_campaign_producto INTEGER, " +
 "FOREIGN KEY(ventas_idventas) REFERENCES ventas(ventas_id) ON DELETE CASCADE);"; 
 
 export const pedidos_table = "CREATE TABLE IF NOT EXISTS pedidos " +
@@ -100,7 +100,7 @@ export const pedidos_table = "CREATE TABLE IF NOT EXISTS pedidos " +
 
 export const productos_pedidos_table = "CREATE TABLE IF NOT EXISTS productos_pedidos " + 
 "(pedidos_idproductos INTEGER PRIMARY KEY AUTOINCREMENT, idproductos_pedidos INTEGER NOT NULL, productos_idproductos INTEGER NOT NULL, " +
-"cantidad INTEGER, created TEXT, pedidos_idpedidos INTEGER, " +
+"cantidad REAL, created TEXT, pedidos_idpedidos INTEGER, " +
 "FOREIGN KEY(idproductos_pedidos) REFERENCES pedidos(idproductos_pedidos) ON DELETE CASCADE, " +
 "FOREIGN KEY(pedidos_idpedidos) REFERENCES pedidos(idpedidos) ON DELETE CASCADE);"; 
 

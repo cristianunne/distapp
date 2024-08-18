@@ -52,11 +52,11 @@ const VentasNotSentScreen = ({route}) => {
 
     return (
         <View style={styles.container}>
-            <Header title={'Ventas Realizadas'} leftIcon={require('../../images/home.png')}
+            <Header title={'Ventas Realizadas no enviadas'} leftIcon={require('../../images/home.png')}
                 rightIcon={require('../../images/cart.png')}
             />
 
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
             <View style={styles.search_box}>
 
                 <TextInput

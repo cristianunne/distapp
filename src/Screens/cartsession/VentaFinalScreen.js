@@ -50,6 +50,7 @@ export const VentaFinalScreen = ({ route }) => {
     const subtotal = route.params.subtotal;
     const descuento_ = route.params.descuento;
     const total = route.params.total - descuento_gen;
+    const fecha_venta = route.params.fecha_venta;
 
     const type_pago = route.params.type_pago;
 
@@ -59,7 +60,7 @@ export const VentaFinalScreen = ({ route }) => {
 
     const createItems = () => {
         let i = 1;
-        console.log(productos);
+        
         for (item of productos) {
             let sub_item = [];
             //console.log(item);
@@ -131,7 +132,8 @@ export const VentaFinalScreen = ({ route }) => {
                             cuenta_corriente: type_pago == 2 ? 1 : 0,
                             is_pay: type_pago == 1 ? 1 : 0,
                             camion_idcamion: idcamion,
-                            status: 0
+                            status: 0,
+                            fecha_venta: fecha_venta
                         }
                         //console.log(data);
             
@@ -194,7 +196,7 @@ export const VentaFinalScreen = ({ route }) => {
             
                                 navigation.navigate('Home');
             
-                            }, 3000)
+                            }, 700)
             
                         
             
@@ -231,6 +233,8 @@ export const VentaFinalScreen = ({ route }) => {
 
         //let ahora = new Date();
         //console.log(new Date().toLocaleString());
+        console.log('FInal');
+        console.log(fecha_venta);
 
     }, [items]);
 
@@ -238,7 +242,7 @@ export const VentaFinalScreen = ({ route }) => {
         <View style={styles.container}>
             <Header title={'Realizar Venta'} leftIcon={require('../../images/home.png')}
             />
-             <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+             <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
             <View style={styles.sub_container}>
                 <View style={styles.box_message}>

@@ -82,7 +82,7 @@ const ProductoDetailsScreen = ({ route, navigation }) => {
             <Header title={'Detalle Compra'} leftIcon={require('../../images/home.png')}
                 rightIcon={require('../../images/cart.png')}></Header>
 
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'}/>
 
             <View style={styles.box_main}>
                 {/* pon aquí el texto que quieras */}

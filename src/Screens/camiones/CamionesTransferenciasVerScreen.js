@@ -39,12 +39,38 @@ const CamionesTransferenciasVerScreen = ({route, navigation}) => {
         setIsLoading(false);
     }
 
+    const onChangeBuscar = (value) => {
+
+        if(value != undefined){
+        
+            setBusqueda(value);
+            filter(value);
+        } else {
+            setDataProducto(dataProductoDinamic);
+        }
+       
+
+    }
+
+    const filter = (textBusqueda) => {
+
+        let resultadoFiltro = dataProductoDinamic.filter((elemento) => {
+
+            if(elemento.producto.name.toString().toLowerCase().includes(textBusqueda.toLowerCase())){
+                return elemento;
+            }
+            
+        })
+        setDataProducto(resultadoFiltro);
+    }
+
 
 
 
     useEffect(() => {
     
         getProductosTransfer();
+        console.log(dataProducto);
 
        
     }, [isFocused, reload])
@@ -54,12 +80,12 @@ const CamionesTransferenciasVerScreen = ({route, navigation}) => {
         rightIcon={require('../../images/cart.png')}
     />
 
-    <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+    <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
     <View style={styles.search_box}>
 
         <TextInput
             style={styles.input}
-            onChangeText={null}
+            onChangeText={onChangeBuscar}
             value={busqueda}
             placeholder="Buscar"
         />

@@ -16,6 +16,7 @@ import ItemsProductosBox from '../../components/ItemsProductosBox'
 const ProductosInicioScreen = () => {
     const [country, setCountry] = React.useState();
 
+
     const [isLoading, setIsLoading] = useState(false);
 
     const [result, setResult] = useState([]);
@@ -92,7 +93,7 @@ const ProductosInicioScreen = () => {
                 rightIcon={require('../../images/cart.png')}
             />
 
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'}/>
             <View style={styles.search_box}>
                    
             <TextInput

@@ -20,6 +20,8 @@ const TypePagoSelectionScreen = ({ route }) => {
     const descuento_ = route.params.descuento;
     const total = route.params.total;
     const descuento_general = route.params.descuento_general;
+    const fecha_venta = route.params.fecha_venta;
+
     //console.log('aca va eldesc ' + descuento_general);
 
     const onChangeDescuento = (value) => {
@@ -35,6 +37,7 @@ const TypePagoSelectionScreen = ({ route }) => {
             subtotal: subtotal,
             descuento: descuento_,
             total: total,
+            fecha_venta: fecha_venta,
             type_pago: 2
         });
     }
@@ -48,6 +51,7 @@ const TypePagoSelectionScreen = ({ route }) => {
             subtotal: subtotal,
             descuento: descuento_,
             total: total,
+            fecha_venta: fecha_venta,
             type_pago: 1
         });
 

@@ -48,7 +48,7 @@ const ItemProductosCompras = ({ number_compra, prod_compra, setIsLoading, reload
             setMarca(prod_compra.marca);
         }
 
-        setNameProduct(name + " (" + marca + ")");
+        setNameProduct(name + " (" + marca + ")" + " - " + prod_compra.content + " (" + prod_compra.unidad + ")");
         setIcon('data:image/png;base64,' + prod_compra.image);
        
         let sts = prod_compra.status == 0 ? 'Pedido' : prod_compra.status == 1 ? 'Comprado' : 

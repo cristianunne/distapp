@@ -47,7 +47,7 @@ const StockInicioScreen = ({ route }) => {
                 rightIcon={require('../../images/cart.png')}
             />
 
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
             <View style={styles.search_box}>
 
                 <TextInput

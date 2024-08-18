@@ -46,6 +46,8 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
 
             const resul = await addProductoToCamionStock(idproducto, idstockcamioncampaign, numberProductos);
 
+           
+
 
             setTimeout(() => {
                 if (resul) {
@@ -83,6 +85,8 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
 
             setIsLoading(true);
             const resul = await editProductoSolicitudesStock(idstock_campaign_producto, numberProductos);
+
+          
 
             setTimeout(() => {
 
@@ -159,12 +163,18 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
 
     useEffect(() => {
 
-        setStock(producto.stock_producto.stock);
-        setDisponible(producto.stock_producto.stock - producto.asignado);
-        if (funcion != 1) {
-            setSolicitado(producto.stock_campaign_producto.cantidad_initial);
+            //console.log('cristian');
+            //console.log(producto.image);
 
-        }
+            setStock(producto.stock_producto.stock);
+            setDisponible(producto.stock_producto.stock - producto.asignado);
+            if (funcion != 1) {
+                setSolicitado(producto.stock_campaign_producto.cantidad_initial);
+    
+            }
+    
+
+       
         
 
     })
@@ -184,8 +194,13 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
             </View>
 
             <View style={styles.description_container}>
-                <Text style={styles.text_producto}>{producto.name + ' (' +
-                    producto.marca + ')'}</Text>
+                <Text style={styles.text_producto}>{producto.name + ' ' +
+                    producto.marca}</Text>
+            </View>
+
+            <View style={styles.description_container}>
+                <Text style={styles.text_producto}>{producto.content + ' ' +
+                     producto.unidad + ')'}</Text>
             </View>
 
             <View style={styles.description_container}>
@@ -212,9 +227,11 @@ const ItemProductoStock = ({ producto, setIsLoading, idstockcamioncampaign, relo
                 <NumericInput type='plus-minus' onChange={value => setNumberProductos(value)}
                     maxValue={disponible}
                     minValue={0}
-                    totalWidth={102}
+                    totalWidth={155}
                     totalHeight={25}
                     iconSize={25}
+                    step={0.1}
+                    valueType='real'
                     rightButtonBackgroundColor='#BCBCBC'
                     leftButtonBackgroundColor='#DCDCDC' />
                     : null}
@@ -244,8 +261,8 @@ const styles = StyleSheet.create({
     container: {
         marginTop: 10,
         padding: 5,
-        minWidth: '32%',
-        maxWidth: '33%',
+        minWidth: '43%',
+        maxWidth: '44%',
         backgroundColor: '#ffffff',
         justifyContent: 'space-between',
         columnGap: 1
@@ -266,7 +283,7 @@ const styles = StyleSheet.create({
     label_category: {
         alignSelf: 'flex-end',
         padding: 2,
-        fontSize: 8,
+        fontSize: 10,
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
         borderBottomLeftRadius: 5,
@@ -289,7 +306,7 @@ const styles = StyleSheet.create({
         marginTop: 5
     },
     text_producto: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 'bold'
 
     },

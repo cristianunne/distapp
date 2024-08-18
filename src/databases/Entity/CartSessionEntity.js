@@ -87,6 +87,43 @@ export async function getCartSessionCount()
 
 }
 
+export async function getCartSessionProductoById(idproducto)
+{
+    const db = SQLITE.openDatabase(database_name);
+
+    const query = "SELECT sum(cantidad) as suma FROM cart_session WHERE productos_idproductos = ?";
+
+    let promise = new Promise((resolve, reject) => {
+        db.transaction(tx => {
+            tx.executeSql(query, [idproducto], 
+                (_, result) => {
+                
+            
+                    resolve(result);
+                }, (err) => {
+                   
+                    reject(err);
+   
+                })
+        });
+    });
+
+    let result = await promise.then( (result) => { 
+        //setResult(true);
+        
+        return result;
+    },
+    (error) => { 
+        //setResult(false);
+        console.log('Error en la cntida de cartsession');
+        return false;
+    });
+
+    //console.log(result);
+    return result;
+
+}
+
 export async function getCartSessionProductos()
 {
     const db = SQLITE.openDatabase(database_name);

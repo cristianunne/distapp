@@ -157,6 +157,8 @@ export default function Login() {
       //tengo que traer los datos de los input text
       const res = await sessionAPI(email, password);
 
+      console.log(res);
+
 
       if (!res) {
         setIsSesion(false);

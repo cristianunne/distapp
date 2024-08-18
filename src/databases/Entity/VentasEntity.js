@@ -7,8 +7,8 @@ export async function insertVentasToDB(data){
     const db = SQLITE.openDatabase(database_name);
 
     const query = "INSERT INTO ventas (created, users_idusers, clientes_idclientes, subtotal, descuentos, total, descuento_general, pedidos_idpedidos, " + 
-    "coordenadas, campaign_idcampaign, cuenta_corriente, is_pay, camion_idcamion, status) " +
-    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    "coordenadas, campaign_idcampaign, cuenta_corriente, is_pay, camion_idcamion, status, fecha_venta) " +
+    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     
 
     let promise = new Promise((resolve, reject) => {
@@ -17,7 +17,7 @@ export async function insertVentasToDB(data){
             tx.executeSql(query, [data.created, data.users_idusers, 
                 data.clientes_idclientes,  data.subtotal, data.descuentos, data.total, data.descuento_general, data.pedidos_idpedidos, 
                 data.coordenadas, 
-                data.campaign_idcampaign, data.cuenta_corriente, data.is_pay, data.camion_idcamion, data.status], 
+                data.campaign_idcampaign, data.cuenta_corriente, data.is_pay, data.camion_idcamion, data.status, data.fecha_venta], 
                 (_, result) => {
                    
                   
@@ -103,6 +103,44 @@ export async function getResumenVentasFromDB(is_pay)
     let promise = new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(query, [is_pay], 
+                (_, result) => {
+                
+            
+                    resolve(result);
+                }, (err) => {
+                   
+                    reject(err);
+   
+                })
+        });
+    });
+
+    let result = await promise.then( (result) => { 
+        //setResult(true);
+        //console.log(result);
+        return result;
+    },
+    (error) => { 
+        //setResult(false);
+        //console.log('Error en User ENtity CANTIDAD');
+        return false;
+    });
+
+    //console.log(result);
+    return result;
+
+}
+
+export async function getResumenVentasByFechaFromDB(is_pay, fecha)
+{
+    const db = SQLITE.openDatabase(database_name);
+
+    const query = "SELECT SUM(subtotal) as subtotal, SUM(descuentos) AS descuentos, SUM(descuento_general) as descuento_general, "
+    + "SUM(total) AS total FROM ventas WHERE is_pay = ? and fecha_venta like ? ORDER BY ventas_id ASC;";
+
+    let promise = new Promise((resolve, reject) => {
+        db.transaction(tx => {
+            tx.executeSql(query, [is_pay, fecha], 
                 (_, result) => {
                 
             

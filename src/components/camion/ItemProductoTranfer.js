@@ -6,7 +6,7 @@ import NumericInput from 'react-native-numeric-input'
 import ButtonView from '../ButtonView';
 import { COLORS, TYPES_BTN } from '../../styles/common_styles';
 import { getProductosStockFetch, uploadTransferProductoCamion } from '../../services/fetching';
-import { deleteStockCampaignProductoById, getStockCampaignProductoById, insertStockCampaignProductoToDB, updateStockCampaignProductoToDB } from '../../databases/Entity/StockCampaignProductoEntity';
+import { deleteStockCampaignProductoById, getStockCampaignProductoById, insertStockCampaignProductoToDB, updateStockCampaignProductoToDB, updateStockCampaignProductoToDBTransfer } from '../../databases/Entity/StockCampaignProductoEntity';
 
 const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_stock_camion, camion_origen, camion_destino, reload, setReload }) => {
 
@@ -63,15 +63,56 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
 
             let resul = await uploadTransferProductoCamion(idcampaign, camion_origen, camion_destino, idstock_campaign_producto, idcampaing_stock_camion,
                 idproducto, numberProductos);
+            
+            console.log(resul);
+            
+            
+            if(resul){
+                //actualizo el stock local, sin impactar en el servidor
+                let producto_stock =  {
+                    idstock_campaign_producto : resul.idstock_campaign_producto,
+                    cantidad : resul.cantidad,
+                    created : resul.created,
+                    modified: resul.modified
+                 } 
+
+
+                 let existe = await getExistProductoStock(resul.idstock_campaign_producto);
+                   
+                 //console.log('actualizo');
+                 if(existe){
+                     //nada
+                     //actualizo los productos
+                     //primero elimino 
+                 
+                     let res = updateProductoStockDB(producto_stock);
+                     console.log('actualizo');
+                   
+
+                 } else {
+                     //inserto
+                     console.log('no existe, agrego');
+                     let res = insertProductoStockToDB(producto_stock);
+
+                     
+                 }
+
+
+            }
+            /*
+            idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
+            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            modified : producto_stock.stock_campaign_producto.modified,
+            cant_transfer: producto_stock.stock_campaign_producto.cant_transfer*/
 
 
             //actualizo el stock local
 
-            const productos_aprob = await getProductosAprobados();
+            //const productos_aprob = await getProductosAprobados();
 
             //let res_eliminar = await eliminarProductoStockDB();
 
-            if(productos_aprob != false && productos_aprob != null){
+            /*if(productos_aprob != false && productos_aprob != null){
 
                 for (item of productos_aprob) {
 
@@ -99,7 +140,7 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
                 
                 }
                  
-            }
+            }*/
 
 
 
@@ -115,7 +156,7 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
                     icon: "success"
                 });
 
-            }, 3000);
+            }, 500);
 
         }
     }
@@ -160,13 +201,13 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
     const updateProductoStockDB = async (producto_stock) => {
 
         let data = {
-            idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
-            cantidad : producto_stock.stock_campaign_producto.cantidad,
-            modified : producto_stock.stock_campaign_producto.modified,
-            cant_transfer: producto_stock.stock_campaign_producto.cant_transfer
+            idstock_campaign_producto : producto_stock.idstock_campaign_producto,
+            cantidad : producto_stock.cantidad,
+            modified : producto_stock.modified,
+            cant_transfer: producto_stock.cant_transfer
         }
 
-        let resul = await updateStockCampaignProductoToDB(data);
+        let resul = await updateStockCampaignProductoToDBTransfer(data);
         //console.log(resul);
 
         return resul;
@@ -193,8 +234,8 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
     }
 
     useEffect(() => {
-        console.log(producto.stock_campaign_producto.cantidad);
-        setDisponible(producto.stock_campaign_producto.cantidad);
+        //console.log('transfer: ' + producto.transferido_no_ap);
+        setDisponible(producto.stock_campaign_producto.cantidad - producto.transferido_no_ap);
     })
 
 
@@ -211,15 +252,23 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
                 <Image source={{ uri: 'data:image/*;base64,' + producto.image }} style={styles.imageproduct} />
             </View>
 
+  
+
             <View style={styles.description_container}>
                 <Text style={styles.text_producto}>{producto.name + ' (' +
-                    producto.marca + ')'}</Text>
+                    producto.marca + ' - ' +  producto.content + ' ' + producto.unidad + ')'}</Text>
             </View>
+
 
 
             <View style={styles.description_container}>
                 <Text style={styles.text_solicitado}>{'Stock del Camión (' +
                     disponible + ')'}</Text>
+            </View>
+
+            <View style={styles.description_container}>
+                <Text style={styles.text_espera_tranf}>{'Espera Transf. (' +
+                    producto.transferido_no_ap + ')'}</Text>
             </View>
 
 
@@ -230,9 +279,11 @@ const ItemProductoTranfer = ({ producto, setIsLoading, idcampaign, idcampaing_st
                 <NumericInput type='plus-minus' onChange={value => setNumberProductos(value)}
                     maxValue={disponible}
                     minValue={0}
-                    totalWidth={100}
+                    totalWidth={150}
                     totalHeight={25}
                     iconSize={25}
+                    step={0.1}
+                    valueType='real'
                     rightButtonBackgroundColor='#BCBCBC'
                     leftButtonBackgroundColor='#DCDCDC' />
 
@@ -258,8 +309,8 @@ const styles = StyleSheet.create({
     container: {
         marginTop: 10,
         padding: 5,
-        minWidth: '32%',
-        maxWidth: '33%',
+        minWidth: '44%',
+        maxWidth: '45%',
         backgroundColor: '#ffffff',
         justifyContent: 'space-between',
         columnGap: 1
@@ -280,7 +331,7 @@ const styles = StyleSheet.create({
     label_category: {
         alignSelf: 'flex-end',
         padding: 2,
-        fontSize: 8,
+        fontSize: 10,
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
         borderBottomLeftRadius: 5,
@@ -303,19 +354,25 @@ const styles = StyleSheet.create({
         marginTop: 5
     },
     text_producto: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 'bold'
 
     },
     text_disponible: {
-        fontSize: 10,
+        fontSize: 11,
         color: COLORS.SUCCESS,
         fontWeight: 'bold'
 
     },
     text_solicitado: {
-        fontSize: 10,
+        fontSize: 11,
         color: COLORS.PRIMARY,
+        fontWeight: 'bold'
+
+    },
+    text_espera_tranf : {
+        fontSize: 11,
+        color: COLORS.DANGER,
         fontWeight: 'bold'
 
     },

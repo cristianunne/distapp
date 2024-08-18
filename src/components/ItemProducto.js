@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { View, StyleShee, TouchableOpacity, StyleSheet, Text, Image, Alert } from 'react-native'
 import { COLORS, TYPES_BTN } from '../styles/common_styles'
 import ButtonCart from './ButtonCart';
-import { insertProductIntoCartSession } from '../databases/Entity/CartSessionEntity';
+import { getCartSessionProductoById, insertProductIntoCartSession } from '../databases/Entity/CartSessionEntity';
 import { showMessage, hideMessage } from "react-native-flash-message";
 import Counter from './Counter';
 import NumericInput from 'react-native-numeric-input'
@@ -15,7 +15,7 @@ import { AppContext } from '../Context/ContextApp';
 const ItemProducto = ({ producto, setIsLoading }) => {
 
 
-    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive] = React.useContext(AppContext);
+    const [isLogin, setIsLogin, user, setUser, campaignActive, setCampaignActive, reload, setReload] = React.useContext(AppContext);
 
     /**
      * Number.prototype.format(n, x, s, c)
@@ -33,40 +33,81 @@ const ItemProducto = ({ producto, setIsLoading }) => {
     };
 
     const [numberProductos, setNumberProductos] = useState();
+    const [dataProductosCart, setDataProductosCart] = useState();
+    const [stockInicial, setStockInicial] = useState(producto.cantidad);
+    const [stockActual, setStockActual] = useState(producto.cantidad);
+
+
+    const updateStock = async (idproducto) => {
+
+        const productos_cart = await getCartSessionProductoById(idproducto);
+
+        if (productos_cart != false){
+            let suma = productos_cart.rows.item(0).suma != null ? productos_cart.rows.item(0).suma : 0;
+
+
+            let res_stock = Number((Number.parseFloat(stockInicial) - Number.parseFloat(suma)).toFixed(1));
+            setStockActual(res_stock);
+        }
+        
+    
+    }
 
 
 
     const addToCart = async () => {
 
-        if(numberProductos > 0){
-            setIsLoading(true);
+        if (numberProductos > stockActual){
 
-            const res_save = await insertProductIntoCartSession(producto.idproductos, numberProductos, 
-                producto.precio, producto.descuento);
-    
-    
-            setTimeout(() => {
-                setIsLoading(false);
-                showMessage({
-                    message: "El Producto se agrego con éxito!",
-                    type: "success",
-                    icon: "success"
-                });
-    
-                /*Alert.alert('Información', 'El producto se agrego con exito', [
-          
-                    {
-                        text: 'Aceptar', onPress: async () => {
-                        }}]);*/
-            }, 3000)
-
-        } else {
             showMessage({
-                message: "La Cantidad debe ser mayor a 0!",
+                message: "La Cantidad de productos supera el Stock Disponible",
                 type: "danger",
                 icon: "danger"
             });
+
+        } else {
+            if(numberProductos > 0){
+
+                setIsLoading(true);
+    
+                const res_save = await insertProductIntoCartSession(producto.idproductos, numberProductos, 
+                    producto.precio, producto.descuento);
+    
+                if (res_save){
+                    await  updateStock(producto.idproductos);
+                  
+    
+                }
+    
+                setTimeout(() => {
+                    setIsLoading(false);
+                
+                    showMessage({
+                        message: "El Producto se agrego con éxito!",
+                        type: "success",
+                        icon: "success"
+                    });
+        
+                    /*Alert.alert('Información', 'El producto se agrego con exito', [
+              
+                        {
+                            text: 'Aceptar', onPress: async () => {
+                            }}]);*/
+                }, 3000)
+    
+              
+    
+            } else {
+                showMessage({
+                    message: "La Cantidad debe ser mayor a 0!",
+                    type: "danger",
+                    icon: "danger"
+                });
+            }
+
         }
+
+       
 
        
 
@@ -75,7 +116,9 @@ const ItemProducto = ({ producto, setIsLoading }) => {
 
 
     useEffect(() => {
-        console.log(numberProductos);
+        //console.log('cristian');
+        //getProductosFromCartSession();
+        updateStock(producto.idproductos);
        
       
     })
@@ -85,7 +128,7 @@ const ItemProducto = ({ producto, setIsLoading }) => {
 
         <View style={styles.container}>
             <View style={styles.label_container}>
-            <Text style={[styles.label_stock]}>{'Stock (' +  producto.cantidad + ')'}</Text>
+            <Text style={[styles.label_stock]}>{'Stock (' +  stockActual + ')'}</Text>
 
                 <Text style={[styles.label_category, {
                     backgroundColor:
@@ -125,11 +168,14 @@ const ItemProducto = ({ producto, setIsLoading }) => {
             </View>
             <View style={styles.counter_container}>
                     
-                <NumericInput type='plus-minus' onChange={value => setNumberProductos(value)} 
-                 totalWidth={101} 
-                 totalHeight={25}
-                 maxValue={producto.cantidad} 
+                <NumericInput type='plus-minus' onChange={value => setNumberProductos(value)}
+                 totalWidth={150} 
+                 totalHeight={32}
+                 minValue={0}
+                 maxValue={stockActual} 
                  iconSize={25}
+                 step={0.1}
+                 valueType='real'
                  rightButtonBackgroundColor='#BCBCBC' 
                  leftButtonBackgroundColor='#DCDCDC'/>
             </View>
@@ -158,8 +204,8 @@ const styles = StyleSheet.create({
     container: {
         marginTop: 10,
         padding: 5,
-        minWidth: '32%',
-        maxWidth: '33%',
+        minWidth: '44%',
+        maxWidth: '45%',
         backgroundColor: '#ffffff',
         justifyContent: 'space-between',
         columnGap: 1
@@ -181,7 +227,7 @@ const styles = StyleSheet.create({
     label_category: {
         alignSelf: 'flex-end',
         padding: 2,
-        fontSize: 8,
+        fontSize: 9,
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
         borderBottomLeftRadius: 5,
@@ -192,7 +238,7 @@ const styles = StyleSheet.create({
     label_stock: {
         alignSelf: 'flex-start',
         padding: 2,
-        fontSize: 8,
+        fontSize: 10,
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
         borderBottomLeftRadius: 5,
@@ -215,7 +261,7 @@ const styles = StyleSheet.create({
         marginTop: 5
     },
     text_producto: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 'bold'
 
     },
@@ -262,7 +308,8 @@ const styles = StyleSheet.create({
     counter_container: {
         flex: 1,
         marginTop: 5,
-        justifyContent: 'flex-end'
+        display: 'flex',
+        justifyContent: 'flex-start'
     },
   
 

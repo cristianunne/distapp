@@ -87,6 +87,8 @@ const ItemProductosCart = ({ producto, setIsLoading, reload, setReload }) => {
 
     useEffect(() => {
 
+        //console.log(producto);
+
     })
 
 
@@ -105,6 +107,9 @@ const ItemProductosCart = ({ producto, setIsLoading, reload, setReload }) => {
             <View style={styles.description_container}>
                 <Text style={styles.text_producto}>{producto.name + ' (' +
                     producto.marca + ')'}</Text>
+                    <Text style={styles.text_producto}>
+                        {producto.content + ' (' + producto.unidad + ')'}
+                    </Text>
             </View>
             <View style={styles.prices_container}>
                 <Text style={styles.prices_text_value}>$
@@ -189,8 +194,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     bottomTabIcon: {
-        width: 65,
-        height: 65
+        width: 50,
+        height: 50
     },
 
     description_container: {

@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native'
 
 const { heiht, width } = Dimensions.get('window');
 
-const Header = ({ title, leftIcon, onClickLeftIcon }) => {
+const Header = ({ title, leftIcon }) => {
 
    
 
@@ -35,6 +35,11 @@ const Header = ({ title, leftIcon, onClickLeftIcon }) => {
 
     }
 
+
+    const onClickLeftIcon = () => {
+        navigation.navigate('Home');
+    }
+
     const onClickRightIcon = () => {
         navigation.navigate('CartSessionInicioScreen',  {
             idpedido : null,
@@ -51,7 +56,7 @@ const Header = ({ title, leftIcon, onClickLeftIcon }) => {
 
     return (
         <View style={styles.header}>
-            <TouchableOpacity style={styles.btn}>
+            <TouchableOpacity style={styles.btn} onPress={onClickLeftIcon}>
                 <Image source={leftIcon} style={styles.icon} />
             </TouchableOpacity>
 

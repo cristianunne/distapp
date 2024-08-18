@@ -18,11 +18,15 @@ const CardCampaign = ({campaign, cantCampaign}) => {
 
         if(campaign_ != undefined){
             const fecha_ini = new Date(campaign_.fecha_inicio);
-            //console.log(fecha_ini.toLocaleDateString());
-            setFechaInicio(fecha_ini.toLocaleDateString());
+            console.log();
+            //console.log(campaign_.fecha_inicio);
+            let fec = (fecha_ini.getDate() + 1) + '/' +  (fecha_ini.getMonth() + 1) + '/' + fecha_ini.getFullYear();
+            setFechaInicio(fec);
     
             const fecha_fin = new Date(campaign_.fecha_fin);
-            setFechaFin(fecha_fin.toLocaleDateString());
+            let fec_fin = (fecha_fin.getDate() + 1) + '/' +  (fecha_fin.getMonth() + 1) + '/' + fecha_fin.getFullYear();
+         
+            setFechaFin(fec_fin);
     
             setNumCampaign(campaign_.number);
         }

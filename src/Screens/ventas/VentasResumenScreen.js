@@ -124,7 +124,7 @@ const VentasResumenScreen = ({ route }) => {
         <View style={styles.container}>
             <Header title={'Resumen de Venta'} leftIcon={require('../../images/home.png')}
             />
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
             {venta.status == 1 ? 
                 <View style={styles.print_container}>
                     <OpenURLButton url={print_url}>Imprimir</OpenURLButton>

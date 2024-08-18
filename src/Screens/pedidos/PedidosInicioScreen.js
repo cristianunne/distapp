@@ -1,49 +1,88 @@
 import React, { useEffect, useState } from 'react'
 import { getPedidosFromDB } from '../../databases/Entity/PedidosEntity';
-import { View, StyleSheet, Text } from 'react-native'
+import { View, StyleSheet, Text, TextInput } from 'react-native'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import { useIsFocused } from '@react-navigation/native';
 import CardsDefault from '../../components/CardDefault'
 import ItemPedidos from '../../components/pedidos/ItemPedidos';
 import { LoadingModal } from 'react-native-loading-modal'
+import PedidosBox from './PedidosBox';
 
 const PedidosInicioScreen = () => {
 
-    const [result, setResult] = useState([]);
+
     const [isLoading, setIsLoading] = useState(false);
-    const [reload, setReload] = useState([]);
+    const [reload, setReload] = useState();
 
     const isFocused = useIsFocused();
 
-    const result_ = [];
+    const [dataProducto, setDataProducto] = useState([]);
+    const [dataProductoDinamic, setDataProductoDinamic] = useState([]);
+    const [busqueda, setBusqueda] = useState('');
+
+
+
+
+    const onChangeBuscar = (value) => {
+
+        if(value != undefined){
+        
+            setBusqueda(value);
+            filter(value);
+        } else {
+            setDataProducto(dataProductoDinamic);
+        }
+       
+
+    }
+
+    const filter = (textBusqueda) => {
+
+        let resultadoFiltro = dataProductoDinamic.filter((elemento) => {
+
+            if(elemento.nombre.toString().toLowerCase().includes(textBusqueda.toLowerCase()) || 
+            elemento.shop_name.toString().toLowerCase().includes(textBusqueda.toLowerCase())){
+                return elemento;
+            }
+            
+        })
+        setDataProducto(resultadoFiltro);
+        //shop_name
+    }
 
     const getPedidos = async () => {
 
         const pedidos = await getPedidosFromDB();
-        //console.log(pedidos);
+        let pedidos_items = [];
 
         for (let i = 0; i < pedidos.rows.length; i++)
         {
-             let pedido = pedidos.rows.item(i);
-             //console.log(compras_stock.rows.item(i));
-
-             result_.push(<ItemPedidos key={i} number={pedido.number} id_pedido={pedido.idpedidos}
-                 fecha={pedido.created} status={pedido.status_val} cliente={pedido.nombre + ' ' + pedido.apellido + ' (' + pedido.shop_name + ')'} 
-                 localidad={pedido.localidad} setIsLoading={setIsLoading} setReload={setReload} reload={reload} idcliente={pedido.clientes_idclientes}/>);
- 
+            pedidos_items.push(pedidos.rows.item(i));
+            
         }
- 
-        setResult(result_);
 
+        setDataProducto(pedidos_items);
+      
+        setDataProductoDinamic(pedidos_items);
 
+        //console.log('fadsfasdgasg');
+        //console.log(pedidos_items);
+        //console.log(dataProducto);
+
+    
+        //setResult(result_);
 
     }
 
 
-    useEffect(() => {
 
+
+    useEffect(() => {
+     
         getPedidos();
+        //createItems();
+        
 
     }, [isFocused, reload]);
 
@@ -54,11 +93,24 @@ const PedidosInicioScreen = () => {
             rightIcon={require('../../images/cart.png')}
         />
 
-        <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+        <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
-        <CardsDefault title={'Pedidos'}>
-          {result}
-        </CardsDefault>
+        <View style={styles.search_box}>
+
+            <TextInput
+                style={styles.input}
+                onChangeText={onChangeBuscar}
+                value={busqueda}
+                placeholder="Buscar"
+            />
+
+        </View>
+
+        <PedidosBox pedidos={dataProducto} setIsLoading={setIsLoading} setReload={setReload} reload={reload} 
+        style={styles.box_pedidos}>
+
+        </PedidosBox>
+
 
 
         <Footer />
@@ -72,6 +124,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#ededed',
+    },
+
+    box_pedidos: {
+        flex: 0.5
     },
 
     text_title: {
@@ -122,6 +178,23 @@ const styles = StyleSheet.create({
 
     text_icon: {
         fontSize: 14
-    }
+    },
+    input: {
+        flex: 1,
+        height: 35,
+        borderWidth: 0.4,
+        padding: 5,
+        alignSelf: 'center',
+        borderColor: '#888888',
+        backgroundColor: '#ffffff'
+    },
+    search_box: {
+        flex: 0.1,
+        flexDirection: 'row',
+        padding: 10,
+        paddingBottom: 0,
+
+
+    },
 });
 

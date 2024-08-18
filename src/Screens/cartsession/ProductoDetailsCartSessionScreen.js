@@ -6,12 +6,13 @@ import ButtonEdit from '../../components/ButtonEdit';
 import ButtonAction from '../../components/ButtonAction';
 import { TYPES_BTN } from '../../styles/common_styles';
 import { useNavigation } from '@react-navigation/native'
-import { updateProductIntoCartSession } from '../../databases/Entity/CartSessionEntity';
+import { getCartSessionProductoById, updateProductIntoCartSession } from '../../databases/Entity/CartSessionEntity';
 import { LoadingModal } from "react-native-loading-modal";
 
 
 import { showMessage, hideMessage } from "react-native-flash-message";
 import Footer from '../../components/Footer';
+import { getStockCampaignProductoById } from '../../databases/Entity/StockCampaignProductoEntity';
 
 const ProductoDetailsCartSessionScreen = ({ route }) => {
 
@@ -34,17 +35,37 @@ const ProductoDetailsCartSessionScreen = ({ route }) => {
 
     const onChangePrecio = (value) => {
 
-        setPrecio(value);
+        if (value == '' || value == null){
+            setPrecio('0');
+        } else {
+            setPrecio(value);
+        }
+       
+       
     }
 
     const onChangeDescuento = (value) => {
 
-        setDescuento(value);
+        if (value == '' || value == null){
+            setDescuento('0');
+        } else {
+            setDescuento(value);
+        }
+
+      
     }
+
+    
 
     const onChangeCantidad = (value) => {
 
-        setCantidad(value);
+        if (value == '' || value == null){
+            setCantidad('0');
+        } else {
+            setCantidad(value);
+        }
+
+       
     }
 
     const onPressCancel = () => {
@@ -52,26 +73,94 @@ const ProductoDetailsCartSessionScreen = ({ route }) => {
     }
 
     const onPressAcept = async () => {
-        setIsLoading(true);
-        //tomo los valores de los states y almaceno
-        const res_update = await updateProductIntoCartSession(producto.id_cart_session, cantidad, precio, descuento);
-        setTimeout(() => {
-            setIsLoading(false);
+
+
+        if (precio == '' || precio == null){
+
             showMessage({
-                message: "El Producto se edito con éxito!",
-                type: "success",
-                icon: "success"
+                message: "El Precio debe ser mayor a 0",
+                type: "danger",
+                icon: "danger"
+            });
+            return;
+
+        } else if (cantidad == '' || cantidad == null){
+
+
+            showMessage({
+                message: "La Cantidad debe ser mayor a 0",
+                type: "danger",
+                icon: "danger"
+            });
+            return;
+          
+        } else if (descuento == '' || descuento == null){
+
+
+          setDescuento(0);
+          
+        }
+
+
+        //traigo los datos y reviso que haya stock disponible
+        const productos_cart = await getCartSessionProductoById(producto.idproductos);
+        let suma = 0;
+        let stock = 0;
+
+        if (productos_cart != false){
+            suma = productos_cart.rows.item(0).suma != null ?  Number(Number.parseFloat(productos_cart.rows.item(0).suma).toFixed(1)) : 0;
+
+        }
+       
+
+
+        const stock_Ca = await getStockCampaignProductoById(producto.idstock_campaign_producto);
+        if (stock_Ca != false){
+            stock = stock_Ca.rows.item(0).cantidad != null ?  Number(Number.parseFloat(stock_Ca.rows.item(0).cantidad).toFixed(1)) : 0;
+
+        }
+
+        //console.log(stock);
+        //console.log((suma - Number.parseFloat(cantidad)));
+        //console.log(Number.parseFloat(cantidad));
+
+        console.log(Number.parseFloat(cantidad));
+
+        let stock_disp = stock - (suma - Number.parseFloat(producto.cart_s_cantidad));
+        console.log(Number.parseFloat(stock_disp));
+
+
+        if(Number.parseFloat(cantidad) > stock_disp){
+
+            showMessage({
+                message: "La Cantidad de productos supera el Stock Disponible",
+                type: "danger",
+                icon: "danger"
             });
 
+        } else {  
+
+            setIsLoading(true);
+            //tomo los valores de los states y almaceno
+            const res_update = await updateProductIntoCartSession(producto.id_cart_session, cantidad, precio, descuento);
             setTimeout(() => {
-                navigation.goBack();
-            }, 3000)
+                setIsLoading(false);
+                showMessage({
+                    message: "El Producto se edito con éxito!",
+                    type: "success",
+                    icon: "success"
+                });
 
-        }, 4000)
+                setTimeout(() => {
+                    navigation.goBack();
+                }, 1000)
 
+            }, 1500)
+
+                
+        }
+        
     }
-
-
 
 
 
@@ -87,14 +176,11 @@ const ProductoDetailsCartSessionScreen = ({ route }) => {
 
             let cantidad_ = producto.cart_s_cantidad;
             setCantidad(cantidad_.toString());
-            console.log('cantidad ' + cantidad_);
+            //console.log('cantidad ' + cantidad_);
             setInitial(false);
+
+            
         }
-
-
-
-        console.log(cantidad);
-        console.log(descuento);
 
 
     }, [cantidad, precio, descuento])
@@ -103,7 +189,7 @@ const ProductoDetailsCartSessionScreen = ({ route }) => {
         <View style={styles.container}>
             <Header title={'Editar Producto'} leftIcon={require('../../images/home.png')}
             />
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
             <View style={styles.box_main}>
                 <View style={styles.box_image}>
                     <View style={styles.box_icon}>

@@ -2,12 +2,13 @@
 
 import { PreventRemoveProvider } from "@react-navigation/native";
 
-//const prefix_url = 'http://192.168.0.9/stockcontrolv3/API/';
-const prefix_url = 'http://192.168.0.154/stockcontrolv3/API/';
-//const prefix_url = 'http://192.168.1.10/stockcontrolv3/API/';
 //const prefix_url = 'http://iighicartografia.com/API/';
 //const prefix_url_print = 'http://iighicartografia.com/';
-const prefix_url_print = 'http://192.168.0.154/stockcontrolv3/';
+//const prefix_url = 'http://192.168.1.8/stockcontrolv3/API/';
+//const prefix_url = 'http://192.168.0.154/stockcontrolv3/API/';
+const prefix_url = 'http://distapppeon.store/API/';
+const prefix_url_print = 'http://distapppeon.store/';
+//const prefix_url_print = 'http://192.168.0.154/stockcontrolv3/'; 
 
 //const prefix_url = 'http://192.168.0.77/stockcontrolv3/API/';
 

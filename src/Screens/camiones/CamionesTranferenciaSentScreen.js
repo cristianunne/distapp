@@ -27,15 +27,48 @@ const CamionesTranferenciaSentScreen = ({ route }) => {
 
     const getProductosAprobados = async () => {
 
-       
+        setIsLoading(true);
         const productos = await getProductosStockFetch(idcampaign, idcammioncampaign);
+        
+        //console.log('ESTE ES');
+        //console.log(productos);
        
         setDataProducto(productos);
-        //setDataProductoDinamic(productos);
+        setIsLoading(false);
+        setDataProductoDinamic(productos);
         //console.log(productos);
    
         //return productos;
     }
+
+
+    const onChangeBuscar = (value) => {
+
+        if(value != undefined){
+        
+            setBusqueda(value);
+            filter(value);
+        } else {
+            setDataProducto(dataProductoDinamic);
+        }
+       
+
+    }
+
+    const filter = (textBusqueda) => {
+
+        let resultadoFiltro = dataProductoDinamic.filter((elemento) => {
+
+            if(elemento.name.toString().toLowerCase().includes(textBusqueda.toLowerCase())){
+                return elemento;
+            }
+            
+        })
+        setDataProducto(resultadoFiltro);
+    }
+
+
+
 
 
 
@@ -58,12 +91,12 @@ const CamionesTranferenciaSentScreen = ({ route }) => {
             rightIcon={require('../../images/cart.png')}
         />
 
-        <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
+        <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'}/>
         <View style={styles.search_box}>
                
         <TextInput
                         style={styles.input}
-                        onChangeText={null}
+                        onChangeText={onChangeBuscar}
                         value={busqueda}
                         placeholder="Buscar"
                     />

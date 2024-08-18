@@ -85,7 +85,7 @@ const CamionLocalInicioScreen = () => {
         <View style={styles.container}>
 
             <Header title={''} leftIcon={require('../../images/home.png')} />
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
             <Text style={styles.text_title}>Operaciones del Camión</Text>
             <View style={styles.box_main}>

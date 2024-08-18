@@ -39,6 +39,9 @@ import VentasNotSentScreen from "./Screens/ventas/VentasNotSentScreen";
 import PedidosScreen from "./Screens/pedidos/PedidosScreen";
 import PedidosInicioScreen from "./Screens/pedidos/PedidosInicioScreen";
 import PedidosResumenProductosScreen from "./Screens/pedidos/PedidosResumenProductosScreen";
+import FechaSelection from "./Screens/cartsession/FechaSelection";
+import VentasResumenDiariaScreen from "./Screens/ventas/VentasResumenDiariaScreen";
+import VentasDiariasFechaSelectScreen from "./Screens/ventas/VentasDiariasFechaSelectScreen";
 
 
 
@@ -78,6 +81,7 @@ const AppNavigator = ({ dbExist }) => {
       <Stack.Screen options={{ headerShown: false }} name="CartSessionInicioScreen" component={CartSessionInicioScreen} />
       <Stack.Screen options={{ headerShown: false }} name="ProductoDetailsCartSessionScreen" component={ProductoDetailsCartSessionScreen} />
       <Stack.Screen options={{ headerShown: false }} name="ClientesSelectionScreen" component={ClientesSelectionScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="FechaSelection" component={FechaSelection} />
       <Stack.Screen options={{ headerShown: false }} name="DescuentoGeneralScreen" component={DescuentoGeneralScreen} />
       <Stack.Screen options={{ headerShown: false }} name="TypePagoSelectionScreen" component={TypePagoSelectionScreen} />
 
@@ -98,6 +102,8 @@ const AppNavigator = ({ dbExist }) => {
       <Stack.Screen options={{ headerShown: false }} name="VentasRealizadasScreen" component={VentasRealizadasScreen} />
       <Stack.Screen options={{ headerShown: false }} name="VentasResumenScreen" component={VentasResumenScreen} />
       <Stack.Screen options={{ headerShown: false }} name="VentasNotSentScreen" component={VentasNotSentScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="VentasResumenDiariaScreen" component={VentasResumenDiariaScreen} />
+      <Stack.Screen options={{ headerShown: false }} name="VentasDiariasFechaSelectScreen" component={VentasDiariasFechaSelectScreen} />
 
       <Stack.Screen options={{ headerShown: false }} name="PedidosScreen" component={PedidosScreen} />
       <Stack.Screen options={{ headerShown: false }} name="PedidosInicioScreen" component={PedidosInicioScreen} />

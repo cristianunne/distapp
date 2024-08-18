@@ -66,7 +66,7 @@ const ProductosComprasScreen = ({route}) => {
          <Header title={'Productos Compras'} leftIcon={require('../../images/home.png')}
                 rightIcon={require('../../images/cart.png')}
             />
-             <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'}/>
+             <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'}/>
 
             <View style={styles.box_main}>
                 <SafeAreaView>

@@ -10,6 +10,7 @@ import { COLORS, TYPES_BTN } from '../../styles/common_styles'
 import ButtonAction from '../../components/ButtonAction'
 import { AppContext } from '../../Context/ContextApp'
 import { getStockCampaignProductoAll } from '../../databases/Entity/StockCampaignProductoEntity'
+import { insertProductIntoCartSession } from '../../databases/Entity/CartSessionEntity'
 
 const PedidosResumenProductosScreen = ({ route }) => {
 
@@ -35,12 +36,13 @@ const PedidosResumenProductosScreen = ({ route }) => {
     const idpedido = route.params.idpedido;
     const idcliente = route.params.idcliente;
     const productos_ = route.params.productos;
-
+    const navigation = useNavigation();
     const [productos, setProductos] = useState(null);
+    const [stock, setStock] = useState(null);
     //console.log(productos);
 
     const [isLoading, setIsLoading] = useState(false);
-
+    const [reload, setReload] = useState(false);
     const [items, setItems] = useState();
     const items_table = [];
 
@@ -49,6 +51,7 @@ const PedidosResumenProductosScreen = ({ route }) => {
     const getProductos = async () => {
 
         const prod_pedidos = await getProductosPedidosByIdFromDB(idpedido);
+     
 
         return prod_pedidos;
 
@@ -57,10 +60,12 @@ const PedidosResumenProductosScreen = ({ route }) => {
     const createItems = async () => {
         let i = 1;
         let productos_ = await getProductos();
+        setProductos(productos_);
 
         //trigo la tabla stock completa, pero tengo que controlar que exista campaign y que exista el stock de los camiones
         //traigo tod en una consulta, si es 0 informo para que actualice
         const stock_producto = await getStockCampaignProductoAll();
+        setStock(stock_producto);
 
         if(stock_producto.rows.length <= 0){
 
@@ -73,55 +78,187 @@ const PedidosResumenProductosScreen = ({ route }) => {
 
         } else {
 
+
+            for (let i = 0; i < productos_.rows.length; i++) {
+                let prod = productos_.rows.item(i);
+
+                //verifico el stock del producto
+                let stock = null;
+                for (let j = 0; j < stock_producto.rows.length; j++) {
+
+                    if(stock_producto.rows.item(j).productos_idproductos == prod.idproductos){
+                        stock = stock_producto.rows.item(j);
+                        break;
+                    }
+                  
+
+                }
+                
+               
+                let cantidad = stock == null ? null : stock.cantidad;
+                let sub_item = [];
+
+                let is_cantidad = stock == null ? true : stock.cantidad == 0 ? true : false;
+
+             
+
+
+    
+                sub_item.push(<View style={styles.row} key={i}> 
+                    <View style={styles.column_prod}>{ stock == null ? 
+                     <Image source={require('../../images/borrar.png')} style={styles.errorIcon} />  :
+                     stock.cantidad == 0 ?
+                     <Image source={require('../../images/borrar.png')} style={styles.errorIcon} />  :
+                    <Image source={require('../../images/check.png')} style={styles.checkIcon} /> 
+                       
+                    }</View>
+                    <View style={styles.column_cantidad}><Text style={styles.text_row_head}>{prod.name + ' (' + prod.content + ' ' + prod.unidad + ')'}</Text></View>
+                    <View style={styles.column_precio}><Text style={styles.text_row_head}>{prod.cantidad != null ? prod.cantidad : 0}</Text></View>
+                    <View style={!is_cantidad ? styles.column_desc : styles.column_desc_error}>
+                        <Text style={is_cantidad ? styles.text_row_head_error : styles.text_row_head}>{
+                       stock == null ? '-----' : cantidad
+
+                    }</Text></View>
+                </View>
+                );
+    
+                items_table.push(sub_item);
+    
+            }
+    
+            setItems(items_table);
+
             
         }
 
 
-        console.log('producto');
-        console.log(stock_producto.rows.length);
+     
 
 
-
-        for (let i = 0; i < productos_.rows.length; i++) {
-            let prod = productos_.rows.item(i);
-
-            let sub_item = [];
-
-            sub_item.push(<View style={styles.row} key={i}>
-                <View style={styles.column_prod}><Text style={styles.text_row_head}>{null}</Text></View>
-                <View style={styles.column_cantidad}><Text style={styles.text_row_head}>{prod.name + ' (' + prod.content + ' ' + prod.unidad + ')'}</Text></View>
-                <View style={styles.column_precio}><Text style={styles.text_row_head}>{prod.cantidad != null ? prod.cantidad : 0}</Text></View>
-                <View style={styles.column_desc}><Text style={styles.text_row_head}>{null}</Text></View>
-            </View>
-            );
-
-            items_table.push(sub_item);
-
-        }
-
-        setItems(items_table);
+       
 
 
     }
 
 
-    const venderPedido = () => {
+    const venderPedido = async () => {
 
         //antes de vender verifico que la campaign este activa
+        let is_goto = false;
+
+        Alert.alert('Pedidos', '¿Desea Vender el Pedido?', [
+            {
+                text: 'Cancelar',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+            {
+                text: 'Aceptar', onPress: async () => {
+
+                    if(campaignActive == null){
+
+                        showMessage({
+                            message: "Para realizar una Venta debe tener una Campaña activa!",
+                            type: "danger",
+                            icon: "danger"
+                        });
+            
+                    } else {
+            
+                        setIsLoading(true);
+            
+                        if(productos != null){
+                            if(stock != null){
+            
+                                for (let i = 0; i < productos.rows.length; i++) {
+                                    let prod = productos.rows.item(i);
+                    
+                                    //verifico el stock del producto
+                                    let stock_ = null;
+                                    for (let j = 0; j < stock.rows.length; j++) {
+                    
+                                        if(stock.rows.item(j).productos_idproductos == prod.idproductos){
+                                            stock_ = stock.rows.item(j);
+                                            break;
+                                        }
+                                      
+                                    }
+            
+                                    //si no existe el stock, no agrego
+                                    //si el stock solicitado es mayor al disponible, agrego el disponiible
+            
+                                    if(stock_ != null){
+            
+                                        if(prod.cantidad > stock_.cantidad && stock_.cantidad  > 0){
+            
+                                            const res_save = await insertProductIntoCartSession(prod.idproductos, 
+                                                stock_.cantidad, 
+                                                prod.precio, prod.descuento);
+
+                                            is_goto = true;
+            
+                                        } else if (prod.cantidad <= stock_.cantidad && stock_.cantidad  > 0){
+            
+                                            const res_save = await insertProductIntoCartSession(prod.idproductos, 
+                                                prod.cantidad, 
+                                                prod.precio, prod.descuento);
+                                            is_goto = true;
+                                        }
+                                    }
+            
+                                }
+            
+                            }
+            
+                        }
+            
+                    }
+                  
+    
+                    if(is_goto){
+
+                        setClientePedido(idcliente);
+                        setPedido(idpedido);
+                        setIsPedido(true);
+                        setIsLoading(false);
+                        setReload(!reload);
+
+                        setTimeout(() => {
+    
+                            navigation.navigate('CartSessionInicioScreen', {
+                                idpedido : idpedido,
+                                idcliente: idcliente
+                            });
+    
+                            setIsLoading(false);
+                            showMessage({
+                                message: "El Pedido se ha cargado con éxito!",
+                                type: "success",
+                                icon: "success"
+                            });
+    
+                        }, 1000)
+
+                    } else {
+                        setIsLoading(false);
+                        showMessage({
+                            message: "Para realizar una Venta deber agregarse productos al carrito!",
+                            type: "danger",
+                            icon: "danger"
+                        });
+                    }
+                    
+
+
+                }
+            },
+        ]);
 
 
 
-        if(campaignActive == null){
+     
 
-            showMessage({
-                message: "Para realizar una Venta debe tener una Campaña activa!",
-                type: "danger",
-                icon: "danger"
-            });
-
-        }
-
-        //console.log(campaignActive);
+      
 
     }
 
@@ -158,7 +295,7 @@ const PedidosResumenProductosScreen = ({ route }) => {
                 <View style={styles.productos_table_container}>
                     <ScrollView>
                         <View style={styles.table_head}>
-                            <View style={styles.column_head_prod}><Text style={styles.text_column_head}></Text></View>
+                            <View style={styles.column_head_prod}><Text style={styles.text_column_head}>¿Stock?</Text></View>
                             <View style={styles.column_head_cantidad}><Text style={styles.text_column_head}>Producto</Text></View>
                             <View style={styles.column_head_precio}><Text style={styles.text_column_head}>Cantidad (Ped.)</Text></View>
                             <View style={styles.column_head_desc}><Text style={styles.text_column_head}>Disponible (Stock)</Text></View>
@@ -228,7 +365,7 @@ const styles = StyleSheet.create({
     },
 
     row: {
-        height: 20,
+        height: 25,
         flexDirection: 'row',
         alignContent: 'center',
         justifyContent: 'space-around'
@@ -295,7 +432,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         alignContent: 'flex-start',
         alignItems: 'flex-start',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         flex: 0.461,
         paddingStart: 3
     },
@@ -335,6 +472,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flex: 0.235
     },
+
+    column_desc_error: {
+
+        borderColor: '#444444',
+        borderWidth: 0.5,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 0.235,
+        backgroundColor: '#f20000',
+    },
     text_column_head: {
         fontSize: 10,
         fontWeight: 'bold'
@@ -342,6 +490,11 @@ const styles = StyleSheet.create({
 
     text_row_head: {
         fontSize: 10
+    },
+
+    text_row_head_error: {
+        fontSize: 10,
+        color: '#ffffff'
     },
 
     box_welcome: {
@@ -393,6 +546,19 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         tintColor: '#ffffff'
+
+    },
+
+    checkIcon: {
+        width: 15,
+        height: 15,
+        tintColor: '#00ff00'
+
+    },
+
+    errorIcon: {
+        width: 15,
+        height: 15,
 
     },
 

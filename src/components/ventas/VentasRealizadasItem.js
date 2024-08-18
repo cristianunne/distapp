@@ -69,7 +69,10 @@ const VentasRealizadasItem = ({venta, sent, reload, setReload}) => {
             camion_idcamion : venta.camion_idcamion,
             productos: productos,
             pedidos_idpedidos: venta.pedidos_idpedidos,
+            fecha_venta: venta.fecha_venta
         }
+
+        console.log(venta_);
 
 
 
@@ -172,7 +175,7 @@ const VentasRealizadasItem = ({venta, sent, reload, setReload}) => {
 
     return (
         <View style={styles.container}>
-             <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+             <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
             <View style={styles.label_container}>
                 <Text style={[styles.label_category, {
                     backgroundColor:

@@ -351,7 +351,7 @@ const ConfInicioScreen = () => {
                         saveCampaignToDb(campaign_res);
                         //traigo los camiones
                         const camiones_res = await getCamionesFetch();
-                        //console.log(camiones_res);
+                        console.log(camiones_res);
 
                         for (item of camiones_res) {
                             //const res = await insertCategories(categoriesData[i]);
@@ -508,7 +508,7 @@ const ConfInicioScreen = () => {
                     const myobj = JSON.parse(user);
 
                     const pedidos = await getPedidosByUserFetch(myobj.idusers);
-            
+
                     //almaceno los datos en la db local
             
                     for (pedido of pedidos)
@@ -612,30 +612,18 @@ const ConfInicioScreen = () => {
                         <Image source={require('../../images/clientes.png')} style={styles.iconItem} />
                         <Text style={styles.text_icon}>Clientes</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.item}>
-                        <Image source={require('../../images/pedido.png')} style={styles.iconItem} />
-                        <Text style={styles.text_icon}>Pedidos</Text>
-                    </TouchableOpacity>
 
                     <TouchableOpacity style={styles.item} onPress={goCompras}>
                         <Image source={require('../../images/bag.png')} style={styles.iconItem} />
                         <Text style={styles.text_icon}>Compras</Text>
                     </TouchableOpacity>
 
-                </View>
-
-                <View style={styles.item_content}>
-
-
                     <TouchableOpacity style={styles.item} onPress={deleteAll}>
-                        <Image source={require('../../images/bag.png')} style={styles.iconItem} />
+                        <Image source={require('../../images/borrar.png')} style={styles.iconItem} />
                         <Text style={styles.text_icon}>Eliminar Todo</Text>
                     </TouchableOpacity>
 
-
                 </View>
-
-
 
 
             </View>

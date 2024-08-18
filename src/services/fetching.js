@@ -381,7 +381,7 @@ export async function addProductoToCamionStock(idproducto_, idstock_camion_campa
     // headers.append('X-CSRF-Token', csrf);
 
     let data = { idproducto: idproducto_, idstockcamioncampaign: idstock_camion_campaign_, cantidad: cantidad_ }
-    console.log(data);
+
 
     const rawResponse = await fetch(URLS.ADD_PRODUCTOS_TO_CAMION_STOCK, {
         method: 'POST',
@@ -587,12 +587,14 @@ export async function uploadTransferProductoCamion(idcampaign, camion_origen, ca
 
     try {
         const content = await rawResponse.json();
+        //console.log('jfsdofjsodjgojgojsdfgsdfgdg');
         //console.log(content);
 
         //user = content;
         return content;
     } catch (err) {
-        console.log(err);
+        //console.log('errordsfsdfsdfs');
+        //console.log(err);
         return false;
     }
 
@@ -635,7 +637,7 @@ export async function getProductosTransferenciasCamionFetch(idcampaign, camion_d
 
 }
 
-export async function acceptTransferCamionFetch(idtransferencia_stock, idstock_campaign_producto, cantidad, idcamion, idcampaign, productos_idproductos) {
+export async function acceptTransferCamionFetch(idtransferencia_stock, idstock_campaign_producto, cantidad, camion_origen, camion_destino, idcampaign, productos_idproductos) {
     let headers = new Headers();
 
 
@@ -645,8 +647,9 @@ export async function acceptTransferCamionFetch(idtransferencia_stock, idstock_c
 
     let data = {
         idtransferencia_stock: idtransferencia_stock, idstock_campaign_producto: idstock_campaign_producto,
-        cantidad: cantidad, idcamion: idcamion, idcampaign: idcampaign, productos_idproductos: productos_idproductos
+        cantidad: cantidad, idcamion: camion_destino, camion_origen: camion_origen, idcampaign: idcampaign, productos_idproductos: productos_idproductos
     }
+    console.log(data);
 
 
     const rawResponse = await fetch(URLS.ACCEPT_TRANSFERS_CAMION, {
@@ -715,6 +718,7 @@ export async function deleteProductosTransferenciasByCamionFetch(idtransferencia
     let data = { idtransferencia_stock: idtransferencia_stock, idstock_campaign_producto: idstock_campaign_producto }
 
 
+
     const rawResponse = await fetch(URLS.DELETE_TRANSFERS_CAMION, {
         method: 'POST',
         headers: headers,
@@ -748,7 +752,7 @@ export async function addVentaFetch(data) {
 
     //let data = {username : 'cris@hotmail.com', password: '1234567'}
     //let data = {idusers :user_id}
-    //console.log(data);
+    console.log(data);
 
 
     const rawResponse = await fetch(URLS.ADD_VENTA, {

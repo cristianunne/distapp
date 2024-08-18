@@ -67,14 +67,17 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
                     let idtransferencia_stock = producto_tranfer.idtransferencia_stock;
                     let idstock_campaign_producto = producto_tranfer.idstock_campaign_producto;
                     let cantidad = producto_tranfer.cantidad;
-                    let idcamion = producto_tranfer.camion_destino;
+                    let camion_destino = producto_tranfer.camion_destino;
+                    let camion_origen = producto_tranfer.camion_origen.idcamiones;
                     let idcampaign = producto_tranfer.idcampaign;
                     let productos_idproductos = producto_tranfer.productos_idproductos;
 
                     setIsLoading(true);
-                    const resul = await acceptTransferCamionFetch(idtransferencia_stock, idstock_campaign_producto, cantidad, idcamion, idcampaign, productos_idproductos)
+                    const resul = await acceptTransferCamionFetch(idtransferencia_stock, idstock_campaign_producto, 
+                        cantidad, camion_origen, camion_destino, idcampaign, productos_idproductos)
 
                     //actualizo el stock local
+                    console.log(resul);
 
 
 
@@ -209,7 +212,7 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
 
         let data = {
             idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
-            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            cantidad : producto_stock.stock_campaign_producto.cantidad - producto_stock.transferido_no_ap,
             modified : producto_stock.stock_campaign_producto.modified,
             cant_transfer: producto_stock.stock_campaign_producto.cant_transfer
         }
@@ -271,7 +274,8 @@ const ItemProductoAcceptTranfer = ({ producto_tranfer, setIsLoading, idcampaign,
 
             <View style={styles.description_container}>
                 <Text style={styles.text_producto}>{producto_tranfer.producto.name + ' (' +
-                    producto_tranfer.producto.marca + ')'}</Text>
+                    producto_tranfer.producto.marca + ' ' +  producto_tranfer.producto.content 
+                    + ' ' + producto_tranfer.producto.unidad  + ')'}</Text>
             </View>
 
 

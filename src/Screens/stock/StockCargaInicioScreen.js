@@ -24,10 +24,20 @@ const StockCargaInicioScreen = ({ route }) => {
 
         setIsLoading(true);
         const productos = await getProductosForStockFetch(idcampaign, idcammioncampaign);
-        //console.log(productos);
 
-        setDataProducto(productos);
-        setDataProductoDinamic(productos);
+        let prod_aux = [];
+       
+        for (item of productos){
+
+            if (item.stock_producto != null) {
+
+                prod_aux.push(item)
+            }
+
+        }
+
+        setDataProducto(prod_aux);
+        setDataProductoDinamic(prod_aux);
         setIsLoading(false);
     }
 
@@ -71,7 +81,7 @@ const StockCargaInicioScreen = ({ route }) => {
                 rightIcon={require('../../images/cart.png')}
             />
 
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
             <View style={styles.search_box}>
 
                 <TextInput
@@ -85,14 +95,15 @@ const StockCargaInicioScreen = ({ route }) => {
             </View>
             <View style={styles.box_main}>
 
-                <SafeAreaView style={styles.box_content}>
+            <SafeAreaView style={styles.box_content}>
                     <ScrollView style={styles.scrollview}>
-
+                    
                         <ItemsProductosStockBox productos={dataProducto} setIsLoading={setIsLoading} idstockcamioncampaign={idcammioncampaign}
                             reload={reload} setReload={setReload} funcion={1}></ItemsProductosStockBox>
 
                     </ScrollView>
                 </SafeAreaView>
+             
             </View>
             <Footer></Footer>
         </View>

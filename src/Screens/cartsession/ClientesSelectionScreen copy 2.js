@@ -11,8 +11,6 @@ import ButtonIcon from '../../components/ButtonIcon';
 import { TYPES_BTN } from '../../styles/common_styles';
 import Footer from '../../components/Footer';
 import { AppContext } from '../../Context/ContextApp';
-import ItemClientesSelectionScreen from './ItemClientesSelectionScreen';
-
 
 
 const ClientesSelectionScreen = ({ route }) => {
@@ -23,13 +21,9 @@ const ClientesSelectionScreen = ({ route }) => {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const [tableData,setTableData] = useState([]);
-    const isFocused = useIsFocused();
     const [items, setItems] = useState();
     const items_table = [];
-   
-
-    const [dataClientes, setDataClientes] = useState();
-    const [dataClientesDinamic, setDataClientesDinamic] = useState();
+    const [dataProductoDinamic, setDataProductoDinamic] = useState();
 
 
     state = {
@@ -44,13 +38,10 @@ const ClientesSelectionScreen = ({ route }) => {
     const idcliente = route.params.idcliente;
 
 
-    const [busqueda, setBusqueda] = useState('');
-
-
     const selectCliente = (cliente) => {
      
 
-        navigation.navigate('FechaSelection', {
+        navigation.navigate('DescuentoGeneralScreen', {
             productos: productos,
             clientes : cliente,
             subtotal : subtotal,
@@ -58,15 +49,6 @@ const ClientesSelectionScreen = ({ route }) => {
             total : total,
 
         });
-
-        /*navigation.navigate('DescuentoGeneralScreen', {
-            productos: productos,
-            clientes : cliente,
-            subtotal : subtotal,
-            descuento : descuento,
-            total : total,
-
-        });*/
 
 
     }
@@ -110,54 +92,59 @@ const ClientesSelectionScreen = ({ route }) => {
 
     const getClientes = async () => {
 
-        setIsLoading(true);
+        //setIsLoading(true);
         const res_clientes = await getClientesDB();
-      
 
-    
-        let data_ = [];
+        //console.log(res_clientes);
+
+        /*for(let j = 0; j < res_clientes.length; j++){
+            console.log(res_clientes.rows.items(j));
+        }*/
+        //console.log(res_clientes.rows.length);
+
+
         for (let j = 0; j < res_clientes.rows.length; j++) {
 
             let item = res_clientes.rows.item(j);
 
-         
-            data_.push(item);
+            let sub_item = [];
+
+            sub_item.push(<View style={styles.row} key={j}>
+                <View style={styles.column_prod_icon}_>
+
+                <ButtonIcon type={TYPES_BTN.SUCCESS} icon={'check'} size_={18}
+                onPress={() => {
+                    selectCliente(res_clientes.rows.item(j));
+                }}></ButtonIcon>
+                </View>
+                <View style={styles.column_shop_name}><Text style={styles.text_row_head}>{item.shop_name}</Text></View>
+                <View style={styles.column_apellido}><Text style={styles.text_row_head}>{item.apellido}</Text></View>
+                <View style={styles.column_nombre}><Text style={styles.text_row_head}>{item.nombre}</Text></View>
+                <View style={styles.column_localidad}><Text style={styles.text_row_head}>{item.localidad}</Text></View></View>
+
+            );
+     
+            items_table.push(sub_item);
 
         }
 
-        setDataClientes(data_);
-        setDataClientesDinamic(data_);
-        setIsLoading(false);
+        setItems(items_table);
 
 
     }
 
-    const onChangeBuscar = (value) => {
-
-        if(value != undefined){
-        
-            setBusqueda(value);
-            filter(value);
-        } else {
-            setDataClientes(dataProductoDinamic);
-        }
-       
-
-    }
 
 
     const filter = (textBusqueda) => {
 
-        let resultadoFiltro = dataClientesDinamic.filter((elemento) => {
+        let resultadoFiltro = dataProductoDinamic.filter((elemento) => {
 
-            if(elemento.nombre.toString().toLowerCase().includes(textBusqueda.toLowerCase()) || 
-            elemento.apellido.toString().toLowerCase().includes(textBusqueda.toLowerCase()) || 
-            elemento.shop_name.toString().toLowerCase().includes(textBusqueda.toLowerCase())){
+            if(elemento.name.toString().toLowerCase().includes(textBusqueda.toLowerCase())){
                 return elemento;
             }
             
         })
-        setDataClientes(resultadoFiltro);
+        setDataProducto(resultadoFiltro);
     }
 
 
@@ -190,8 +177,9 @@ const ClientesSelectionScreen = ({ route }) => {
         }
 
        
+       
        getClientes();
-    }, [isFocused]);
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -203,8 +191,8 @@ const ClientesSelectionScreen = ({ route }) => {
                    
                    <TextInput
                                    style={styles.input}
-                                   onChangeText={onChangeBuscar}
-                                   value={busqueda}
+                                   onChangeText={null}
+                                   value={null}
                                    placeholder="Buscar"
                                />
        
@@ -223,9 +211,7 @@ const ClientesSelectionScreen = ({ route }) => {
                             
                         </View>
 
-                        <ItemClientesSelectionScreen productos={productos} subtotal={subtotal}
-                        descuento={descuento} total={total}
-                        clientes={dataClientes}></ItemClientesSelectionScreen>
+                        {items}
 
                         </ScrollView>
 

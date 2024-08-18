@@ -19,6 +19,11 @@ const VentasInicioScreenOptions = () => {
         navigation.navigate('VentasInicioScreen');
     }
 
+    const goToResumenVentasDiarias = () => {
+        navigation.navigate('VentasDiariasFechaSelectScreen');
+    }
+
+
     const goToVentasNotSentScreen = () => {
         navigation.navigate('VentasNotSentScreen');
     }
@@ -32,7 +37,7 @@ const VentasInicioScreenOptions = () => {
         <View style={styles.container}>
 
             <Header title={''} leftIcon={require('../../images/home.png')} />
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
             <Text style={styles.text_title}>Ventas</Text>
             <View style={styles.box_main}>
@@ -42,6 +47,18 @@ const VentasInicioScreenOptions = () => {
                         <Image source={require('../../images/dinero.png')} style={styles.iconItemGreen} />
                         <Text style={styles.text_icon}>Resumen de Ventas</Text>
                     </TouchableOpacity>
+
+
+                    <TouchableOpacity style={styles.item} onPress={goToResumenVentasDiarias}>
+                        <Image source={require('../../images/dinero.png')} style={styles.iconItemGreen} />
+                        <Text style={styles.text_icon}>Resumen de Ventas Diarias</Text>
+                    </TouchableOpacity>
+
+
+                </View>
+
+                <View style={styles.item_content}>
+                
 
                     <TouchableOpacity style={styles.item} onPress={goToVentas}>
                         <Image source={require('../../images/ventas.png')} style={styles.iconItem} />
@@ -53,6 +70,7 @@ const VentasInicioScreenOptions = () => {
                         <Text style={styles.text_icon}>Ventas Sin Enviar</Text>
                     </TouchableOpacity>
 
+    
 
                 </View>
 
@@ -94,13 +112,14 @@ const styles = StyleSheet.create({
     },
 
     box_main: {
-        flex: 0.3,
+        flex: 0.4,
         backgroundColor: '#FFFFFF',
         borderRadius: 10,
         padding: 10,
         flexDirection: 'column',
         justifyContent: 'space-between',
         margin: 15,
+        
 
 
     },
@@ -110,6 +129,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingLeft: 7,
         paddingRight: 7,
+        marginTop: 10
     },
 
     item_content_final: {

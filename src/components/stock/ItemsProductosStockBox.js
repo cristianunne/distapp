@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     rowGap: 1,
     columnGap: 4,
     paddingBottom: 20,
+    justifyContent: 'space-between'
 
   },
 });

@@ -16,7 +16,7 @@ const ClientesSelectionScreen = ({ route }) => {
 
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
-    const [tableData,setTableData] = useState([]);
+    const [tableData, setTableData] = useState([]);
 
     state = {
         tableHead: ['', 'Comercio', 'Apellido', 'Nombre', 'Localidad', 'Telefono'],

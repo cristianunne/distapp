@@ -6,7 +6,8 @@ import { COLORS } from '../styles/common_styles';
 
 const CardsDefault = (props) => {
     return (
-      <View style={[styles.box_welcome, styles.elevation]}>
+      <View style={[styles.box_welcome, styles.elevation, 
+        props.size != null ? {  flex: props.size} : null]}>
       <View style={styles.box_header}>
           <View>
               <Text style={styles.text_header}>{props.title}</Text>

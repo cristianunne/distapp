@@ -122,7 +122,7 @@ const ClientesInicioScreen = () => {
             <Header title={'Clientes'} leftIcon={require('../../images/home.png')}
                 rightIcon={require('../../images/cart.png')}
             />
-             <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+             <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
             <View style={styles.container}>
                 <CardSync title={'Actualizar Clientes'}>

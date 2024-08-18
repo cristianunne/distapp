@@ -57,7 +57,7 @@ const CamionesCardInformation = ({ camion }) => {
             idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
             productos_idproductos : producto_stock.stock_campaign_producto.productos_idproductos,
             stock_camion_campaign_idstock_camion_campaign : producto_stock.stock_campaign_producto.stock_camion_campaign_idstock_camion_campaign,
-            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            cantidad :  producto_stock.stock_campaign_producto.cantidad - producto_stock.transferido_no_ap,
             cantidad_initial : producto_stock.stock_campaign_producto.cantidad_initial,
             created : producto_stock.stock_campaign_producto.created,
             modified : producto_stock.stock_campaign_producto.modified,
@@ -74,7 +74,7 @@ const CamionesCardInformation = ({ camion }) => {
 
         let data = {
             idstock_campaign_producto : producto_stock.stock_campaign_producto.idstock_campaign_producto,
-            cantidad : producto_stock.stock_campaign_producto.cantidad,
+            cantidad : producto_stock.stock_campaign_producto.cantidad - producto_stock.transferido_no_ap,
             modified : producto_stock.stock_campaign_producto.modified,
             cant_transfer: producto_stock.stock_campaign_producto.cant_transfer
         }
@@ -228,7 +228,7 @@ const CamionesCardInformation = ({ camion }) => {
 
         return (
             <View style={styles.container}>
-                  <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+                  <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
                 <View style={styles.sub_container}>
                     <View style={styles.box_message}>
                         <View style={styles.icon_info}>

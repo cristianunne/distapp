@@ -15,6 +15,7 @@ import { delete_cart_session_table } from '../../databases/querysTables';
 import * as SQLITE from 'expo-sqlite'
 import { database_name, deleteTables } from '../../databases/databaseServices';
 import { showMessage, hideMessage } from "react-native-flash-message";
+import {Dimensions} from 'react-native';
 
 
 const CartSessionInicioScreen = ({ route }) => {
@@ -44,6 +45,9 @@ const CartSessionInicioScreen = ({ route }) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
+    
+    const windowWidth = Dimensions.get('window').width;
+    const windowHeight = Dimensions.get('window').height;
 
     const [result, setResult] = useState([]);
     const isFocused = useIsFocused();
@@ -139,7 +143,8 @@ const CartSessionInicioScreen = ({ route }) => {
             let producto = productos.rows.item(i);
             items_.push(producto);
 
-            result_.push(<ItemProductosCart key={i} producto={producto} setIsLoading={setIsLoading} reload={reload} setReload={setReload} />);
+            result_.push(<ItemProductosCart key={i} producto={producto} 
+                setIsLoading={setIsLoading} reload={reload} setReload={setReload} />);
 
             subtotal_ = subtotal_ + (producto.cart_s_precio * producto.cart_s_cantidad);
             let des = producto.cart_s_descuento != null ? producto.cart_s_descuento : 0;
@@ -179,6 +184,8 @@ const CartSessionInicioScreen = ({ route }) => {
             getProductos();
         }
 
+        console.log(windowHeight);
+
 
     }, [isFocused, reload])
 
@@ -191,7 +198,7 @@ const CartSessionInicioScreen = ({ route }) => {
                 rightIcon={require('../../images/cart.png')}
             />
 
-            <LoadingModal modalVisible={isLoading} color={'#00ff00'} title={'Cargando....'} />
+            <LoadingModal modalVisible={isLoading} color={'#00ff00'} task={'Cargando....'} />
 
             {campaignActive == null ? messageError() : null}
 
@@ -209,16 +216,21 @@ const CartSessionInicioScreen = ({ route }) => {
                 <View style={styles.box_resumen}>
                     <View style={styles.box_sub_resumen_main}>
                         <View style={styles.box_sub_resumen}>
-                            <Text style={styles.label}>Subtotal: </Text>
-                            <Text style={styles.prices_text_value}>
+                        
+                            <Text style={windowHeight > 690 ? styles.label : styles.label_min}>Subtotal: </Text>
+                            <Text style={windowHeight > 690 ? styles.prices_text_value : styles.prices_text_value_min}>
+                         
                                 $
                                 {subTotal != null ?
                                     subTotal.format(2, 3, '.', ',') : 0}
                             </Text>
                         </View>
                         <View style={styles.box_sub_resumen}>
-                            <Text style={styles.label}>Descuentos: </Text>
-                            <Text style={styles.descuento_text_value}>
+                          
+                            <Text style={windowHeight > 690 ? styles.label : styles.label_min}>Descuentos: </Text>
+                            <Text style={windowHeight > 690 ? styles.descuento_text_value : styles.descuento_text_value_min}>
+                         
+        
                                 $
                                 {descuentos != null ?
                                     descuentos.format(2, 3, '.', ',') : 0}
@@ -226,8 +238,8 @@ const CartSessionInicioScreen = ({ route }) => {
 
                         </View>
                         <View style={styles.box_sub_resumen}>
-                            <Text style={styles.label_total}>Total: </Text>
-                            <Text style={styles.label_total}>
+                            <Text style={windowHeight > 690 ? styles.label_total : styles.label_total_min}>Total: </Text>
+                            <Text style={windowHeight > 690 ? styles.label_total : styles.label_total_min}>
                                 $
                                 {total != null ?
                                     total.format(2, 3, '.', ',') : 0}
@@ -285,6 +297,7 @@ const styles = StyleSheet.create({
     box_sub_resumen_main: {
         flex: 0.7,
         flexDirection: 'column',
+        
     },
 
     box_main: {
@@ -317,7 +330,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         flexDirection: 'row',
         marginTop: 5,
-        flex: 0.3
+        flex: 0.5
 
     },
     label: {
@@ -325,6 +338,14 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         alignSelf: 'center',
         fontSize: 18
+
+    },
+
+    label_min: {
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+        alignSelf: 'center',
+        fontSize: 15
 
     },
 
@@ -337,14 +358,34 @@ const styles = StyleSheet.create({
         color: '#555555'
 
     },
+    label_total_min: {
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+        alignSelf: 'center',
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#555555'
+
+    },
     prices_text_value: {
         fontSize: 18,
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: '#339944'
     },
+    prices_text_value_min: {
+        fontSize: 16,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: '#339944'
+    },
     descuento_text_value: {
         fontSize: 18,
+        color: '#FF0000',
+        textDecorationLine: 'line-through'
+    },
+    descuento_text_value_min: {
+        fontSize: 16,
         color: '#FF0000',
         textDecorationLine: 'line-through'
     },
